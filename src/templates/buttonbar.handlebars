@@ -1,0 +1,5 @@
+{{#each buttons}}
+  <div class="group" data-group="{{@key}}">{{#each this}}
+    <button type="button" title="{{text}}" class="icon-{{role}}{{action}}" data-role="{{role}}" data-action="{{action}}" data-shortcut={{shortcut}}{{#if disabled}} disabled{{/if}}><span>{{text}}</span></button>
+  {{/each}}</div>
+{{/each}}

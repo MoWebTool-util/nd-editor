@@ -6,6 +6,7 @@
 
 'use strict';
 
+var $ = require('jquery');
 var Widget = require('nd-widget');
 var Template = require('nd-template');
 
@@ -43,8 +44,7 @@ var Editor = Widget.extend({
     uploadServer: null
   },
 
-  events: {
-  },
+  events: {},
 
   // initProps: function() {
   // },
@@ -251,11 +251,11 @@ Editor.pluginEntry = {
       host.$('[x-type="wysiwyg"]:not([data-rendered])').each(function(i, field) {
         field.style.display = 'none';
         field.setAttribute('data-rendered', 'true');
-        addWidget(field.name, new Editor({
+        addWidget(field.name, new Editor($.extend(true, {
           trigger: field,
           proxy: host.get('proxy'),
           uploadServer: host.get('uploadServer')
-        }).render());
+        }, plugin.getOptions('config'))).render());
       });
     };
 

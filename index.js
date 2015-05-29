@@ -92,6 +92,8 @@ var Editor = Widget.extend({
 
       that.isReady = true;
 
+      that.editor.setHTML(that.get('trigger').value);
+
       that.trigger('ready', that.editor);
     });
   },

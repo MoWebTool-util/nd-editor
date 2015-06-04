@@ -1,7 +1,6 @@
 /**
- * Description: index.js
- * Author: crossjs <liwenfu@crossjs.com>
- * Date: 2014-12-22 14:01:18
+ * @module Editor
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';
@@ -264,11 +263,15 @@ Editor.pluginEntry = {
     typeof host.use === 'function' &&
       plugin.on('export', function(instance) {
         host.use(function(next) {
+          // destroyed
+          if (!instance.element) {
+            return next();
+          }
           instance.execute(function(err) {
             if (!err) {
               next();
             }
-          });
+          }, 'Editor');
         });
       });
 
@@ -276,6 +279,13 @@ Editor.pluginEntry = {
 
     typeof host.addField === 'function' &&
       host.after('addField', plugin.execute);
+
+    typeof host.removeField === 'function' &&
+      host.before('removeField', function(name) {
+        if (name in _widgets) {
+          _widgets[name].destroy();
+        }
+      });
 
     host.before('destroy', function() {
       Object.keys(_widgets).forEach(function(key) {

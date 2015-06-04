@@ -1,6 +1,6 @@
 /**
- * @module: Editor
- * @author: crossjs <liwenfu@crossjs.com> - 2015-05-07 13:05:11
+ * @module Editor
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';

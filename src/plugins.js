@@ -1,10 +1,6 @@
 'use strict';
 
 module.exports = [
-  // {
-  //   name: 'keys',
-  //   starter: require('./plugins/keys')
-  // },
   {
     name: 'paste',
     starter: require('./plugins/paste')

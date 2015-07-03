@@ -77,6 +77,7 @@ module.exports = function() {
           fields: [{
             label: '链接',
             name: 'url',
+            type: 'url',
             attrs: {
               placeholder: 'URL',
               autofocus: true

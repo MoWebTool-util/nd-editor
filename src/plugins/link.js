@@ -5,7 +5,7 @@
 
 'use strict';
 
-var DialogForm = require('../modules/dialog-form');
+var FormDialog = require('../modules/form-dialog');
 
 module.exports = function() {
   var plugin = this,
@@ -22,19 +22,19 @@ module.exports = function() {
       var url = 'http://';
 
       // if (editor.hasFormat('A')) {
-        var cpath = editor.getPath().slice();
-        var anchor;
-        while ((anchor = cpath.pop())) {
-          if (anchor.nodeName === 'A') {
-            editor.selectNode(anchor);
+      var cpath = editor.getPath().slice();
+      var anchor;
+      while ((anchor = cpath.pop())) {
+        if (anchor.nodeName === 'A') {
+          editor.selectNode(anchor);
 
-            url = anchor.getAttribute('href');
+          url = anchor.getAttribute('href');
 
-            break;
-          }
-
-          anchor = null;
+          break;
         }
+
+        anchor = null;
+      }
       // }
 
       var makeLink = function(data) {
@@ -68,9 +68,8 @@ module.exports = function() {
         return editor.focus();
       };
 
-      dialog = new DialogForm({
-        title: '插入链接',
-        formAttrs: {
+      dialog = new FormDialog({
+          title: '插入链接',
           formData: {
             url: url
           },
@@ -82,9 +81,23 @@ module.exports = function() {
               autofocus: true
             }
           }]
-        },
-        callback: makeLink
-      }).show();
+        })
+        .on('formCancel', function() {
+          this.destroy();
+        })
+        .on('formSubmit', function() {
+          var that = this;
+
+          // 调用队列
+          this.submit(function(data) {
+            makeLink(data);
+            that.destroy();
+          });
+
+          // 阻止默认事件发生
+          return false;
+        })
+        .render();
     }
   });
 

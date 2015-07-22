@@ -26,7 +26,7 @@ module.exports = function() {
 
       if (inSource) {
         inSource = false;
-        d.button.classList.remove('active');
+        d.button.className = d.button.className.replace(/(\b|\s)active(\b|\s)/, ' ').trim();
 
         var value = textarea.val();
 
@@ -38,7 +38,7 @@ module.exports = function() {
         return d.editor.focus();
       } else {
         inSource = true;
-        d.button.classList.add('active');
+        d.button.className += ' active';
 
         valueCached = d.editor.getHTML();
 

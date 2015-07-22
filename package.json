@@ -22,7 +22,7 @@
     "dependencies": {
       "jquery": "1.11.1",
       "nd-template": "1.0.0",
-      "nd-confirm": "1.0.0",
+      "nd-alert": "1.0.0",
       "nd-form": "1.0.0",
       "nd-upload": "1.0.0",
       "nd-validator": "1.0.0",

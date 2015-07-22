@@ -5,7 +5,7 @@
 
 'use strict';
 
-var DialogForm = require('../modules/dialog-form');
+var FormDialog = require('../modules/form-dialog');
 
 module.exports = function() {
   var plugin = this,
@@ -54,43 +54,73 @@ module.exports = function() {
         return editor.focus();
       };
 
-      dialog = new DialogForm({
-        title: '插入图片',
-        formAttrs: {
-          proxy: host.get('proxy'),
+      var fields = [{
+        label: '图片地址',
+        name: 'url',
+        attrs: {
+          // required: 'required'
+        }
+      }];
+      var pluginCfg = {};
+
+      var server = host.get('server');
+
+      if (server) {
+        fields.push({
+          type: 'custom',
+          cls: 'sep-v',
+          value: 'or'
+        }, {
+          label: '本地文件',
+          name: 'file',
+          type: 'file',
+          attrs: {
+            placeholder: '选择图片文件',
+            // required: 'required',
+            multiple: false,
+            // accept: 'image/*'
+            accept: '.gif,.jpg,.jpeg,.bmp,.png',
+            // 最多文件数
+            // maxcount: 3,
+            // 单个最大字节数
+            // maxbytes: 5 * 1024 * 1024,
+            // 用于类型提示
+            title: '图片文件',
+            swf: '/lib/uploader.swf',
+            // 返回完整地址，而不是默认的 dentryId
+            realpath: true
+          }
+        });
+
+        pluginCfg.Upload = [function() {
+          this.setOptions('config', server);
+        }];
+      }
+
+      dialog = new FormDialog({
+          title: '插入图片',
           formData: {
             url: url
           },
-          fields: [{
-            label: '地址',
-            name: 'url',
-            attrs: {
-              // required: 'required'
-            }
-          }, {
-            label: '上传',
-            name: 'file',
-            type: 'file',
-            attrs: {
-              // required: 'required',
-              multiple: false,
-              // accept: 'image/*'
-              accept: '.gif,.jpg,.jpeg,.bmp,.png',
-              // 最多文件数
-              // maxcount: 3,
-              // 单个最大字节数
-              // maxbytes: 5 * 1024 * 1024,
-              // 用于类型提示
-              title: '图片文件',
-              server: host.get('uploadServer'),
-              swf: '/static/lib/uploader.swf',
-              // 返回完整地址，而不是默认的 dentryId
-              realpath: true
-            }
-          }]
-        },
-        callback: makeImage
-      }).show();
+          fields: fields,
+          pluginCfg: pluginCfg
+        })
+        .on('formCancel', function() {
+          this.destroy();
+        })
+        .on('formSubmit', function() {
+          var that = this;
+
+          // 调用队列
+          this.submit(function(data) {
+            makeImage(data);
+            that.destroy();
+          });
+
+          // 阻止默认事件发生
+          return false;
+        })
+        .render();
     }
   });
 

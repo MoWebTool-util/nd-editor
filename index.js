@@ -37,16 +37,10 @@ var Editor = Widget.extend({
     },
     insertInto: function(element, parentNode) {
       element.insertAfter(parentNode);
-    },
-
-    proxy: null,
-    uploadServer: null
+    }
   },
 
   events: {},
-
-  // initProps: function() {
-  // },
 
   setup: function() {
     this._renderButtonbar();
@@ -253,9 +247,7 @@ Editor.pluginEntry = {
         field.style.display = 'none';
         field.setAttribute('data-rendered', 'true');
         addWidget(field.name, new Editor($.extend(true, {
-          trigger: field,
-          proxy: host.get('proxy'),
-          uploadServer: host.get('uploadServer')
+          trigger: field
         }, plugin.getOptions('config'))).render());
       });
     };

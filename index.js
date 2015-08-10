@@ -35,8 +35,17 @@ var Editor = Widget.extend({
         return val || this.get('trigger');
       }
     },
+
     insertInto: function(element, parentNode) {
       element.insertAfter(parentNode);
+    },
+
+    inFilter: function(data) {
+      return data;
+    },
+
+    outFilter: function(data) {
+      return data;
     }
   },
 
@@ -85,7 +94,7 @@ var Editor = Widget.extend({
 
       that.isReady = true;
 
-      that.editor.setHTML(that.get('trigger').value);
+      that.editor.setHTML(that.get('inFilter')(that.get('trigger').value));
 
       that.trigger('ready', that.editor);
     });
@@ -222,7 +231,7 @@ var Editor = Widget.extend({
   },
 
   execute: function(callback) {
-    this.get('trigger').value = this.editor.getHTML().replace(/<p><br><\/p>/g, '');
+    this.get('trigger').value = this.get('outFilter')(this.editor.getHTML().replace(/<p><br><\/p>/g, ''));
     callback();
   }
 
@@ -243,7 +252,9 @@ Editor.pluginEntry = {
     }
 
     plugin.execute = function() {
-      host.$('[x-type="wysiwyg"]:not([data-rendered])').each(function(i, field) {
+      host.$('[x-type="wysiwyg"]')
+      .filter(':not([data-rendered])')
+      .each(function(i, field) {
         field.style.display = 'none';
         field.setAttribute('data-rendered', 'true');
         addWidget(field.name, new Editor($.extend(true, {

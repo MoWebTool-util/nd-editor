@@ -37,16 +37,50 @@ module.exports = function() {
         image = null;
       }
 
+      var server = host.get('server');
+
       var makeImage = function(data) {
-        var url = data.file || data.url;
+        var size;
+
+        if (data.width && !isNaN(data.width)) {
+          size = +data.width;
+        }
+
+        if (data.height && !isNaN(data.height)) {
+          size = Math.min(size, +data.height);
+        }
+
+        if (data.file) {
+          data.url = server.download({
+            value: data.file
+          }, size ? {
+            size: size
+          } : null).src;
+        } else if (size) {
+          if (data.url.indexOf('&size') !== -1) {
+            data.url = data.url.replace(/(&size=)\d+/, '$1' + size);
+          }
+        }
 
         if (image) {
-          image.src = url;
+          image.src = data.url;
         } else {
           image = editor.createElement('IMG', {
-            src: url
+            src: data.url
           });
           editor.insertElement(image);
+        }
+
+        if (data.file) {
+          image.setAttribute('data-src', data.file);
+        }
+
+        if (data.width) {
+          image.width = data.width;
+        }
+
+        if (data.height) {
+          image.height = data.height;
         }
 
         dialog = null;
@@ -54,16 +88,50 @@ module.exports = function() {
         return editor.focus();
       };
 
+      var sizes = [80, 120, 160, 240, 320, 480, 640, 960]
+      .map(function(size) {
+        return '<option value="' + size + '">';
+      });
+
       var fields = [{
+        type: 'custom',
+        value: '<datalist id="dimension-sizes">' + sizes.join('') + '</datalist>'
+      }, {
+        group: 'dimension',
+        label: '图片尺寸',
+        inline: true,
+        fields: [{
+          name: 'width',
+          value: image && image.width || '',
+          attrs: {
+            placeholder: '宽，像素值',
+            'data-rule': 'number digits',
+            'data-display': '宽',
+            'list': 'dimension-sizes'
+          }
+        }, {
+          type: 'custom',
+          cls: 'sep',
+          value: '-'
+        }, {
+          name: 'height',
+          value: image && image.height || '',
+          attrs: {
+            placeholder: '高，像素值',
+            'data-rule': 'number digits',
+            'data-display': '高',
+            'list': 'dimension-sizes'
+          }
+        }]
+      }, {
         label: '图片地址',
         name: 'url',
         attrs: {
           // required: 'required'
         }
       }];
-      var pluginCfg = {};
 
-      var server = host.get('server');
+      var pluginCfg = {};
 
       if (server) {
         fields.push({
@@ -75,25 +143,17 @@ module.exports = function() {
           name: 'file',
           type: 'file',
           attrs: {
-            placeholder: '选择图片文件',
-            // required: 'required',
             multiple: false,
-            // accept: 'image/*'
             accept: '.gif,.jpg,.jpeg,.bmp,.png',
-            // 最多文件数
-            // maxcount: 3,
-            // 单个最大字节数
-            // maxbytes: 5 * 1024 * 1024,
-            // 用于类型提示
             title: '图片文件',
-            swf: '/lib/uploader.swf',
-            // 返回完整地址，而不是默认的 dentryId
-            realpath: true
+            swf: '/lib/uploader.swf'
           }
         });
 
         pluginCfg.Upload = [function() {
-          this.setOptions('config', server);
+          this.setOptions('config', {
+            server: server
+          });
         }];
       }
 
@@ -145,53 +205,3 @@ module.exports = function() {
   // 通知就绪
   this.ready();
 };
-
-// video: function(sources) {
-//   var children = JSON.parse(sources).map(function(source) {
-//     return this.createElement('SOURCE', source);
-//   }, this);
-
-//   var video = this.createElement('VIDEO', {
-//     controls: 'controls',
-//     width: 320,
-//     height: 240
-//   }, children);
-
-//   var placeholder = this.createElement('IMG', {
-//     'data-editor-html': video.outerHTML,
-//     'data-editor-object': 'video',
-//     src: env.TRANSPARENT_GIF,
-//     'class': 'editor-object editor-objec-video',
-//     width: 320,
-//     height: 240
-//   });
-
-//   this.insertElement(placeholder);
-
-//   return placeholder;
-// },
-
-// audio: function(sources) {
-//   var children = JSON.parse(sources).map(function(source) {
-//     return this.createElement('SOURCE', source);
-//   }, this);
-
-//   var audio = this.createElement('AUDIO', {
-//     controls: 'controls',
-//     width: 320,
-//     height: 240
-//   }, children);
-
-//   var placeholder = this.createElement('IMG', {
-//     'data-editor-html': audio.outerHTML,
-//     'data-editor-object': 'audio',
-//     src: env.TRANSPARENT_GIF,
-//     'class': 'editor-object editor-objec-audio',
-//     width: 320,
-//     height: 240
-//   });
-
-//   this.insertElement(placeholder);
-
-//   return placeholder;
-// },

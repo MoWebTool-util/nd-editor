@@ -27,6 +27,7 @@ module.exports = function() {
 
       while ((image = cpath.pop())) {
         if (image.nodeName === 'IMG') {
+          if(!image.parentNode) continue;
           editor.selectNode(image);
 
           url = image.src;
@@ -170,7 +171,6 @@ module.exports = function() {
         })
         .on('formSubmit', function() {
           var that = this;
-
           // 调用队列
           this.submit(function(data) {
             makeImage(data);

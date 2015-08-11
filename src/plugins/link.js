@@ -21,9 +21,9 @@ module.exports = function() {
       var editor = d.editor;
       var url = 'http://';
 
-      // if (editor.hasFormat('A')) {
       var cpath = editor.getPath().slice();
       var anchor;
+
       while ((anchor = cpath.pop())) {
         if (anchor.nodeName === 'A') {
           editor.selectNode(anchor);
@@ -35,7 +35,6 @@ module.exports = function() {
 
         anchor = null;
       }
-      // }
 
       var makeLink = function(data) {
         var url = data.url;
@@ -122,41 +121,3 @@ module.exports = function() {
   // 通知就绪
   this.ready();
 };
-
-
-// link: function(url, attributes) {
-//   var range = this.range.getSelection();
-//   if (range.collapsed) {
-//     var protocolEnd = url.indexOf(':') + 1;
-//     if (protocolEnd) {
-//       while (url[protocolEnd] === '/') {
-//         protocolEnd += 1;
-//       }
-//     }
-//     this.range.insertNodeInRange(
-//       range,
-//       this.getDocument().createTextNode(url.slice(protocolEnd))
-//     );
-//   }
-
-//   if (!attributes) {
-//     attributes = {};
-//   }
-//   attributes.href = url;
-
-//   this.changeFormat({
-//     tag: 'A',
-//     attributes: attributes
-//   }, {
-//     tag: 'A'
-//   }, range);
-
-//   return this.focus();
-// },
-
-// unlink: function() {
-//   this.changeFormat(null, {
-//     tag: 'A'
-//   }, this.range.getSelection(), true);
-//   return this.focus();
-// },

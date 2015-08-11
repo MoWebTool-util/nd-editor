@@ -49,24 +49,6 @@ module.exports = function() {
     }
   };
 
-  // var removeList = function(frag) {
-  //   var lists = frag.querySelectorAll('UL, OL'),
-  //     i, l, ll, list, listFrag, children, child;
-  //   for (i = 0, l = lists.length; i < l; i += 1) {
-  //     list = lists[i];
-  //     listFrag = this.dom.empty(list);
-  //     children = listFrag.childNodes;
-  //     ll = children.length;
-  //     while (ll--) {
-  //       child = children[ll];
-  //       this.dom.replaceWith(child, this.dom.empty(child));
-  //     }
-  //     this.dom.fixContainer(listFrag);
-  //     this.dom.replaceWith(list, listFrag);
-  //   }
-  //   return frag;
-  // };
-
   host.addButton({
     role: 'orderedlist',
     text: 'Ordered List',

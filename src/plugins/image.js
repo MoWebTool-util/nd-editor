@@ -27,7 +27,11 @@ module.exports = function() {
 
       while ((image = cpath.pop())) {
         if (image.nodeName === 'IMG') {
-          if(!image.parentNode) continue;
+
+          if (!image.parentNode) {
+            continue;
+          }
+
           editor.selectNode(image);
 
           url = image.src;
@@ -90,9 +94,9 @@ module.exports = function() {
       };
 
       var sizes = [80, 120, 160, 240, 320, 480, 640, 960]
-      .map(function(size) {
-        return '<option value="' + size + '">';
-      });
+        .map(function(size) {
+          return '<option value="' + size + '">';
+        });
 
       var fields = [{
         type: 'custom',

@@ -19,7 +19,7 @@ module.exports = function() {
     group: 'richtext',
     handlers: function(e, d) {
       var editor = d.editor;
-      var url = 'http://';
+      var url = '';
 
       var cpath = editor.getPath().slice();
       var anchor;
@@ -76,7 +76,8 @@ module.exports = function() {
             label: '链接',
             name: 'url',
             attrs: {
-              placeholder: 'URL',
+              placeholder: 'http://',
+              required: 'required',
               autofocus: true
             }
           }]

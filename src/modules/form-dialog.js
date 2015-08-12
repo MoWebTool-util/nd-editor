@@ -7,11 +7,12 @@
 
 var Alert = require('nd-alert');
 var Form = require('nd-form');
+var Select = require('nd-select');
 var Upload = require('nd-upload');
 var Validator = require('nd-validator');
 
 module.exports = Form.extend({
-  Plugins: [Upload, Validator],
+  Plugins: [Select, Upload, Validator],
   attrs: {
     buttons: [{
       label: '取消',

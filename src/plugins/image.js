@@ -5,6 +5,8 @@
 
 'use strict';
 
+var debug = require('nd-debug');
+
 var FormDialog = require('../modules/form-dialog');
 
 module.exports = function() {
@@ -12,6 +14,13 @@ module.exports = function() {
     host = plugin.host;
 
   var dialog;
+
+  var server = host.get('server');
+
+  if (!server) {
+    debug.warn('Image uploader requires server.');
+    return;
+  }
 
   host.addButton({
     role: 'image',
@@ -21,9 +30,12 @@ module.exports = function() {
       var editor = d.editor;
       // 2ac6061d-22c0-4925-91a2-50cfb8593bc2
       var url = '';
+      var file = '';
+      var size = 0;
 
       var cpath = editor.getPath().slice();
       var image;
+      var match;
 
       while ((image = cpath.pop())) {
         if (image.nodeName === 'IMG') {
@@ -36,35 +48,47 @@ module.exports = function() {
 
           url = image.src;
 
+          match = url.match(/\?dentryId=([-0-9a-f]+)/);
+          if (match) {
+            file = match[1];
+          }
+
+          match = url.match(/&size=(\d+)/);
+          if (match) {
+            size = +match[1];
+          }
+
           break;
         }
 
         image = null;
       }
 
-      var server = host.get('server');
+      function setImageSize() {
+        var img = new Image();
+
+        img.onload = function() {
+          image.setAttribute('height', img.height);
+          image.setAttribute('width', img.width);
+          img.onload = null;
+        };
+
+        img.src = image.src;
+
+        if (img.complete) {
+          img.onload();
+        }
+      }
 
       var makeImage = function(data) {
-        var size;
-
-        if (data.width && !isNaN(data.width)) {
-          size = +data.width;
-        }
-
-        if (data.height && !isNaN(data.height)) {
-          size = Math.min(size, +data.height);
-        }
+        data.size = +data.size;
 
         if (data.file) {
           data.url = server.download({
             value: data.file
-          }, size ? {
-            size: size
+          }, data.size ? {
+            size: data.size
           } : null).src;
-        } else if (size) {
-          if (data.url.indexOf('&size') !== -1) {
-            data.url = data.url.replace(/(&size=)\d+/, '$1' + size);
-          }
         }
 
         if (image) {
@@ -76,17 +100,9 @@ module.exports = function() {
           editor.insertElement(image);
         }
 
-        if (data.file) {
-          image.setAttribute('data-src', data.file);
-        }
+        image.setAttribute('data-src', data.file);
 
-        if (data.width) {
-          image.width = data.width;
-        }
-
-        if (data.height) {
-          image.height = data.height;
-        }
+        setImageSize();
 
         dialog = null;
 
@@ -94,97 +110,66 @@ module.exports = function() {
       };
 
       var sizes = [80, 120, 160, 240, 320, 480, 640, 960]
-        .map(function(size) {
-          return '<option value="' + size + '">';
-        });
+          .map(function(size) {
+            return {
+              text: size,
+              value: size
+            };
+          });
+
+      sizes.unshift({
+        text: '原图',
+        value: 0
+      });
 
       var fields = [{
-        type: 'custom',
-        value: '<datalist id="dimension-sizes">' + sizes.join('') + '</datalist>'
-      }, {
-        group: 'dimension',
+        name: 'size',
         label: '图片尺寸',
-        inline: true,
-        fields: [{
-          name: 'width',
-          value: image && image.width || '',
-          attrs: {
-            placeholder: '宽，像素值',
-            'data-rule': 'number digits',
-            'data-display': '宽',
-            'list': 'dimension-sizes'
-          }
-        }, {
-          type: 'custom',
-          cls: 'sep',
-          value: '-'
-        }, {
-          name: 'height',
-          value: image && image.height || '',
-          attrs: {
-            placeholder: '高，像素值',
-            'data-rule': 'number digits',
-            'data-display': '高',
-            'list': 'dimension-sizes'
-          }
-        }]
+        type: 'select',
+        options: sizes
       }, {
-        label: '图片地址',
-        name: 'url',
+        label: '本地文件',
+        name: 'file',
+        type: 'file',
         attrs: {
-          // required: 'required'
+          required: 'required',
+          multiple: false,
+          accept: '.gif,.jpg,.jpeg,.bmp,.png',
+          title: '图片文件',
+          swf: '/lib/uploader.swf'
         }
       }];
 
-      var pluginCfg = {};
-
-      if (server) {
-        fields.push({
-          type: 'custom',
-          cls: 'sep-v',
-          value: 'or'
-        }, {
-          label: '本地文件',
-          name: 'file',
-          type: 'file',
-          attrs: {
-            multiple: false,
-            accept: '.gif,.jpg,.jpeg,.bmp,.png',
-            title: '图片文件',
-            swf: '/lib/uploader.swf'
-          }
+      dialog = new FormDialog({
+        title: '插入图片',
+        formData: {
+          size: size,
+          file: file
+        },
+        fields: fields,
+        pluginCfg: {
+          'Upload': [function() {
+            this.setOptions('config', {
+              server: server
+            });
+          }]
+        }
+      })
+      .on('formCancel', function() {
+        this.destroy();
+      })
+      .on('formSubmit', function() {
+        var that = this;
+        // 调用队列
+        this.submit(function(data) {
+          makeImage(data);
+          that.destroy();
         });
 
-        pluginCfg.Upload = [function() {
-          this.setOptions('config', {
-            server: server
-          });
-        }];
-      }
-
-      dialog = new FormDialog({
-          title: '插入图片',
-          formData: {
-            url: url
-          },
-          fields: fields,
-          pluginCfg: pluginCfg
-        })
-        .on('formCancel', function() {
-          this.destroy();
-        })
-        .on('formSubmit', function() {
-          var that = this;
-          // 调用队列
-          this.submit(function(data) {
-            makeImage(data);
-            that.destroy();
-          });
-
-          // 阻止默认事件发生
-          return false;
-        })
-        .render();
+        // 阻止默认事件发生
+        return false;
+      })
+      .render();
     }
   });
 

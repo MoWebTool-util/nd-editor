@@ -24,6 +24,8 @@
       "nd-template": "1.0.0",
       "nd-alert": "1.0.0",
       "nd-form": "1.0.0",
+      "nd-debug": "1.0.0",
+      "nd-select": "1.0.0",
       "nd-upload": "1.0.0",
       "nd-validator": "1.0.0",
       "nd-widget": "1.0.0"

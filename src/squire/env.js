@@ -2,20 +2,20 @@
 
 var ua = navigator.userAgent;
 
-var isIOS = /iP(?:ad|hone|od)/.test( ua );
-var isMac = /Mac OS X/.test( ua );
-var isGecko = /Gecko\//.test( ua );
-var isIElt11 = /Trident\/[456]\./.test( ua );
+var isIOS = /iP(?:ad|hone|od)/.test(ua);
+var isMac = /Mac OS X/.test(ua);
+var isGecko = /Gecko\//.test(ua);
+var isIElt11 = /Trident\/[456]\./.test(ua);
 var isPresto = !!window.opera;
-var isWebKit = /WebKit\//.test( ua );
+var isWebKit = /WebKit\//.test(ua);
 
 module.exports = {
 
   DOCUMENT_POSITION_PRECEDING: 2, // Node.DOCUMENT_POSITION_PRECEDING
-  ELEMENT_NODE: 1,                // Node.ELEMENT_NODE;
-  TEXT_NODE: 3,                   // Node.TEXT_NODE;
-  SHOW_ELEMENT: 1,                // NodeFilter.SHOW_ELEMENT;
-  SHOW_TEXT: 4,                   // NodeFilter.SHOW_TEXT;
+  ELEMENT_NODE: 1, // Node.ELEMENT_NODE;
+  TEXT_NODE: 3, // Node.TEXT_NODE;
+  SHOW_ELEMENT: 1, // NodeFilter.SHOW_ELEMENT;
+  SHOW_TEXT: 4, // NodeFilter.SHOW_TEXT;
 
   ZWS: '\u200B',
 
@@ -80,6 +80,17 @@ module.exports = {
   canObserveMutations: typeof MutationObserver !== 'undefined',
 
   // Use [^ \t\r\n] instead of \S so that nbsp does not count as white-space
-  notWS: /[^ \t\r\n]/
+  notWS: /[^ \t\r\n]/,
+
+  indexOf: Array.prototype.indexOf
 
 };
+
+// Polyfill for FF3.5
+// if (!Object.create) {
+//   Object.create = function(proto) {
+//     var F = function() {};
+//     F.prototype = proto;
+//     return new F();
+//   };
+// }

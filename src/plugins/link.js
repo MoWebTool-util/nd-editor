@@ -78,11 +78,7 @@ module.exports = function() {
             attrs: {
               placeholder: 'http://',
               required: 'required',
-              autofocus: true,
-              pattern: '^(https?|ftp|mailto):\/\/.+$'
-            },
-            messages: {
-              pattern: '必须以http|https|ftp|mailto开头'
+              autofocus: true
             }
           }]
         })

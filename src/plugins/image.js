@@ -110,12 +110,12 @@ module.exports = function() {
       };
 
       var sizes = [80, 120, 160, 240, 320, 480, 640, 960]
-          .map(function(size) {
-            return {
-              text: size,
-              value: size
-            };
-          });
+        .map(function(size) {
+          return {
+            text: size,
+            value: size
+          };
+        });
 
       sizes.unshift({
         text: '原图',
@@ -141,35 +141,35 @@ module.exports = function() {
       }];
 
       dialog = new FormDialog({
-        title: '插入图片',
-        formData: {
-          size: size,
-          file: file
-        },
-        fields: fields,
-        pluginCfg: {
-          'Upload': [function() {
-            this.setOptions('config', {
-              server: server
-            });
-          }]
-        }
-      })
-      .on('formCancel', function() {
-        this.destroy();
-      })
-      .on('formSubmit', function() {
-        var that = this;
-        // 调用队列
-        this.submit(function(data) {
-          makeImage(data);
-          that.destroy();
-        });
+          title: '插入图片',
+          formData: {
+            size: size,
+            file: file
+          },
+          fields: fields,
+          pluginCfg: {
+            'Upload': [function() {
+              this.setOptions('config', {
+                server: server
+              });
+            }]
+          }
+        })
+        .on('formCancel', function() {
+          this.destroy();
+        })
+        .on('formSubmit', function() {
+          var that = this;
+          // 调用队列
+          this.submit(function(data) {
+            makeImage(data);
+            that.destroy();
+          });
 
-        // 阻止默认事件发生
-        return false;
-      })
-      .render();
+          // 阻止默认事件发生
+          return false;
+        })
+        .render();
     }
   });
 

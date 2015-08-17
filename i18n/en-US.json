@@ -1,10 +1,11 @@
 {
-  "插入图片": "Insert image",
-  "地址": "Address",
-  "上传": "Upload",
-  "选择图片文件": "Select image",
+  "原图": "Original",
+  "取消": "Cancel",
+  "图片尺寸": "Image Size",
   "图片文件": "Image",
+  "提交": "Submit",
+  "插入图片": "Insert image",
   "插入链接": "Insert link",
-  "链接": "Link",
-  "必须以http|https|ftp|mailto开头":"Must begin with http|https|ftp|mailto"
+  "本地文件": "Image File",
+  "链接": "Link"
 }

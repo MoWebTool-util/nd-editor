@@ -158,16 +158,9 @@ module.exports = function() {
         .on('formCancel', function() {
           this.destroy();
         })
-        .on('formSubmit', function() {
-          var that = this;
-          // 调用队列
-          this.submit(function(data) {
-            makeImage(data);
-            that.destroy();
-          });
-
-          // 阻止默认事件发生
-          return false;
+        .on('formSubmit', function(data) {
+          makeImage(data);
+          this.destroy();
         })
         .render();
     }

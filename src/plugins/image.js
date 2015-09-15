@@ -15,6 +15,9 @@ module.exports = function() {
 
   var dialog;
 
+  var PER_SIZE = '100%';
+  var cache = {};
+
   var server = host.get('server');
 
   if (!server) {
@@ -68,8 +71,13 @@ module.exports = function() {
         var img = new Image();
 
         img.onload = function() {
-          image.setAttribute('height', img.height);
-          image.setAttribute('width', img.width);
+          if (cache.size === PER_SIZE) {
+            image.setAttribute('width', PER_SIZE);
+          }else {
+            image.setAttribute('height', img.height);
+            image.setAttribute('width', img.width);
+          }
+
           img.onload = null;
         };
 
@@ -81,6 +89,7 @@ module.exports = function() {
       }
 
       var makeImage = function(data) {
+        cache.size = data.size;
         data.size = +data.size;
 
         if (data.file) {
@@ -109,7 +118,7 @@ module.exports = function() {
         return editor.focus();
       };
 
-      var sizes = [80, 120, 160, 240, 320, 480, 640, 960]
+      var sizes = [PER_SIZE, 80, 120, 160, 240, 320, 480, 640, 960]
         .map(function(size) {
           return {
             text: size,

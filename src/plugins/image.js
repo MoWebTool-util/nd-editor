@@ -5,6 +5,7 @@
 
 'use strict';
 
+var __ = require('nd-i18n');
 var debug = require('nd-debug');
 
 var FormDialog = require('../modules/form-dialog');
@@ -127,30 +128,30 @@ module.exports = function() {
         });
 
       sizes.unshift({
-        text: '原图',
+        text: __('原图'),
         value: 0
       });
 
       var fields = [{
         name: 'size',
-        label: '图片尺寸',
+        label: __('图片尺寸'),
         type: 'select',
         options: sizes
       }, {
-        label: '本地文件',
+        label: __('本地文件'),
         name: 'file',
         type: 'file',
         attrs: {
           required: 'required',
           multiple: false,
           accept: '.gif,.jpg,.jpeg,.bmp,.png',
-          title: '图片文件',
+          title: __('图片文件'),
           swf: '/lib/uploader.swf'
         }
       }];
 
       dialog = new FormDialog({
-          title: '插入图片',
+          title: __('插入图片'),
           formData: {
             size: size,
             file: file

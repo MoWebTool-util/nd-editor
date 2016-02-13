@@ -237,6 +237,8 @@ var Editor = Widget.extend({
 
 });
 
+Editor.FormDialog = require('./src/modules/form-dialog');
+
 Editor.pluginEntry = {
   name: 'Editor',
   starter: function() {

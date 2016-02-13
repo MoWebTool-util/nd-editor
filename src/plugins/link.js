@@ -5,6 +5,7 @@
 
 'use strict';
 
+var __ = require('nd-i18n');
 var FormDialog = require('../modules/form-dialog');
 
 module.exports = function() {
@@ -68,12 +69,12 @@ module.exports = function() {
       };
 
       dialog = new FormDialog({
-          title: '插入链接',
+          title: __('插入链接'),
           formData: {
             url: url
           },
           fields: [{
-            label: '链接',
+            label: __('链接'),
             name: 'url',
             attrs: {
               placeholder: 'http://',

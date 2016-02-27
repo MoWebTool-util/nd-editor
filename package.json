@@ -1,6 +1,6 @@
 {
   "name": "nd-editor",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "rich text editor",
   "keywords": [],
   "homepage": "https://github.com/ndfront/nd-editor",
@@ -22,16 +22,16 @@
   "licenses": "MIT",
   "main": "index.js",
   "dependencies": {
-    "jquery": "^1.11.1",
-    "nd-template": "^3.0.0",
-    "nd-alert": "^3.0.0",
-    "nd-form": "^3.0.0",
+    "nd-template": "^3.0.1",
+    "nd-alert": "^3.0.1",
+    "nd-form": "^3.0.4",
     "nd-debug": "^3.0.0",
     "nd-i18n": "^3.0.0",
-    "nd-select": "^3.0.0",
-    "nd-upload": "^3.0.0",
-    "nd-validator": "^3.0.0",
-    "nd-widget": "^3.0.0"
+    "nd-select": "^3.0.1",
+    "nd-upload": "^3.0.2",
+    "nd-validator": "^3.0.1",
+    "nd-widget": "^3.0.1",
+    "nd-jquery": "^2.2.1"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",

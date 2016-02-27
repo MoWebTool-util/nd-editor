@@ -1,6 +1,6 @@
 {
   "name": "nd-editor",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "rich text editor",
   "keywords": [],
   "homepage": "https://github.com/ndfront/nd-editor",
@@ -29,7 +29,7 @@
     "nd-i18n": "^3.0.0",
     "nd-select": "^3.0.1",
     "nd-upload": "^3.0.2",
-    "nd-validator": "^3.0.1",
+    "nd-validator": "^3.0.2",
     "nd-widget": "^3.0.1",
     "nd-jquery": "^2.2.1"
   },

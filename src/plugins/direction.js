@@ -3,11 +3,11 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host
 
   host.addButton({
     role: 'dir',
@@ -17,27 +17,27 @@ module.exports = function() {
     handlers: function(e, d) {
       d.editor.forEachBlock(function(block) {
         if (block.dir === d.action) {
-          block.removeAttribute('dir');
+          block.removeAttribute('dir')
         } else {
-          block.dir = d.action;
+          block.dir = d.action
         }
-      }, true);
+      }, true)
 
-      return d.editor.focus();
+      return d.editor.focus()
     }
-  });
+  })
 
   host.addButton({
     role: 'dir',
     action: 'rtl',
     text: 'Right to Left',
     group: 'direction'
-  });
+  })
 
   host.on('viewChange', function(state) {
-    host.enableButton('dir', state === 'wysiwyg');
-  });
+    host.enableButton('dir', state === 'wysiwyg')
+  })
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}

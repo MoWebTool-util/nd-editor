@@ -3,15 +3,15 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host
 
-  var inSource = false;
-  var textarea;
-  var valueCached;
+  var inSource = false
+  var textarea
+  var valueCached
 
   host.addButton({
     role: 'code',
@@ -19,34 +19,34 @@ module.exports = function() {
     group: 'tool',
     handlers: function(e, d) {
       if (!textarea) {
-        textarea = host.$('.container > textarea');
+        textarea = host.$('.container > textarea')
       }
 
-      host.trigger('viewChange', inSource ? 'wysiwyg' : 'source');
+      host.trigger('viewChange', inSource ? 'wysiwyg' : 'source')
 
       if (inSource) {
-        inSource = false;
-        d.button.className = d.button.className.replace(/(\b|\s)active(\b|\s)/, ' ').trim();
+        inSource = false
+        d.button.className = d.button.className.replace(/(\b|\s)active(\b|\s)/, ' ').trim()
 
-        var value = textarea.val();
+        var value = textarea.val()
 
         if (value !== valueCached) {
-          d.editor.setHTML(value);
+          d.editor.setHTML(value)
         }
 
-        textarea.hide().empty();
-        return d.editor.focus();
+        textarea.hide().empty()
+        return d.editor.focus()
       } else {
-        inSource = true;
-        d.button.className += ' active';
+        inSource = true
+        d.button.className += ' active'
 
-        valueCached = d.editor.getHTML();
+        valueCached = d.editor.getHTML()
 
-        return textarea.val(valueCached).show().focus();
+        return textarea.val(valueCached).show().focus()
       }
     }
-  });
+  })
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}

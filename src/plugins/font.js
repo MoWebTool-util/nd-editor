@@ -3,35 +3,35 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host
 
   var format = function(tag, remove) {
     remove = remove ? {
       tag: remove
-    } : null;
+    } : null
 
     return function(e, d) {
-      e.preventDefault();
+      e.preventDefault()
 
       if (d.editor.hasFormat(tag)) {
         d.editor.changeFormat(null, {
           tag: tag
-        });
+        })
         // host.activeButton(d.role, false);
       } else {
         d.editor.changeFormat({
           tag: tag
-        }, remove);
+        }, remove)
         // host.activeButton(d.role, true);
       }
 
-      return d.editor.focus();
-    };
-  };
+      return d.editor.focus()
+    }
+  }
 
   host.addButton({
     role: 'bold',
@@ -39,7 +39,7 @@ module.exports = function() {
     group: 'font',
     shortcut: 'ctrl+b',
     handlers: format('STRONG')
-  });
+  })
 
   host.addButton({
     role: 'italic',
@@ -47,7 +47,7 @@ module.exports = function() {
     group: 'font',
     shortcut: 'ctrl+i',
     handlers: format('EM')
-  });
+  })
 
   host.addButton({
     role: 'underline',
@@ -55,7 +55,7 @@ module.exports = function() {
     group: 'font',
     shortcut: 'ctrl+u',
     handlers: format('U')
-  });
+  })
 
   host.addButton({
     role: 'strikethrough',
@@ -63,7 +63,7 @@ module.exports = function() {
     group: 'font',
     shortcut: 'ctrl+shift+7',
     handlers: format('S')
-  });
+  })
 
   host.addButton({
     role: 'mark',
@@ -71,7 +71,7 @@ module.exports = function() {
     group: 'font',
     shortcut: 'ctrl+shift+8',
     handlers: format('MARK')
-  });
+  })
 
   host.addButton({
     role: 'subscript',
@@ -79,7 +79,7 @@ module.exports = function() {
     group: 'font',
     shortcut: 'ctrl+shift+5',
     handlers: format('SUB', 'SUP')
-  });
+  })
 
   host.addButton({
     role: 'supscript',
@@ -87,8 +87,8 @@ module.exports = function() {
     group: 'font',
     shortcut: 'ctrl+shift+6',
     handlers: format('SUP', 'SUB')
-  });
+  })
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}

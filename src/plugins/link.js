@@ -3,54 +3,54 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
-var __ = require('nd-i18n');
-var FormDialog = require('../modules/form-dialog');
+var __ = require('nd-i18n')
+var FormDialog = require('../modules/form-dialog')
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host
 
-  var dialog;
+  var dialog
 
   host.addButton({
     role: 'link',
     text: 'Link',
     group: 'richtext',
     handlers: function(e, d) {
-      var editor = d.editor;
-      var url = '';
+      var editor = d.editor
+      var url = ''
 
-      var cpath = editor.getPath().slice();
-      var anchor;
+      var cpath = editor.getPath().slice()
+      var anchor
 
       while ((anchor = cpath.pop())) {
         if (anchor.nodeName === 'A') {
-          editor.selectNode(anchor);
+          editor.selectNode(anchor)
 
-          url = anchor.getAttribute('href');
+          url = anchor.getAttribute('href')
 
-          break;
+          break
         }
 
-        anchor = null;
+        anchor = null
       }
 
       var makeLink = function(data) {
-        var url = data.url;
-        var range = editor.range.getSelection();
+        var url = data.url
+        var range = editor.range.getSelection()
 
         if (!url) {
           editor.changeFormat(null, {
             tag: 'A'
-          }, editor.range.getSelection(), true);
+          }, editor.range.getSelection(), true)
         } else {
           if (range.collapsed) {
             editor.range.insertNodeInRange(
               range,
               editor.getDocument().createTextNode(url)
-            );
+            )
           }
 
           editor.changeFormat({
@@ -60,58 +60,58 @@ module.exports = function() {
             }
           }, {
             tag: 'A'
-          }, range);
+          }, range)
         }
 
-        dialog = null;
+        dialog = null
 
-        return editor.focus();
-      };
+        return editor.focus()
+      }
 
       dialog = new FormDialog({
-          title: __('插入链接'),
-          formData: {
-            url: url
-          },
-          fields: [{
-            label: __('链接'),
-            name: 'url',
-            attrs: {
-              placeholder: 'http://',
-              required: 'required',
-              autofocus: true
-            }
-          }]
-        })
-        .on('formCancel', function() {
-          this.destroy();
-        })
-        .on('formSubmit', function(data) {
-          makeLink(data);
-          this.destroy();
-        })
-        .render();
+        title: __('插入链接'),
+        formData: {
+          url: url
+        },
+        fields: [{
+          label: __('链接'),
+          name: 'url',
+          attrs: {
+            placeholder: 'http://',
+            required: 'required',
+            autofocus: true
+          }
+        }]
+      })
+      .on('formCancel', function() {
+        this.destroy()
+      })
+      .on('formSubmit', function(data) {
+        makeLink(data)
+        this.destroy()
+      })
+      .render()
     }
-  });
+  })
 
   host.on('ready', function(editor) {
     editor.delegateEvents({
       'mousedown': function(e) {
         if (/^(?:IMG|AUDIO|VIDEO|HR)$/.test(e.target.nodeName)) {
-          this.selectNode(e.target);
+          this.selectNode(e.target)
         }
       }
-    });
-  });
+    })
+  })
 
   host.before('destroy', function() {
-    dialog && dialog.destroy();
-  });
+    dialog && dialog.destroy()
+  })
 
   host.on('viewChange', function(state) {
-    host.enableButton('link', state === 'wysiwyg');
-  });
+    host.enableButton('link', state === 'wysiwyg')
+  })
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}

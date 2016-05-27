@@ -8,62 +8,58 @@
     "JSON": true
   },
   "rules": {
-    "no-bitwise": 0,
     "camelcase": 2,
+    "comma-dangle": 2,
     "curly": 2,
+    "dot-notation": 0,
     "eqeqeq": 2,
-    "no-unused-expressions": [
-      2,
-      {
-        "allowShortCircuit": true,
-        "allowTernary": true
-      }
-    ],
-    "guard-for-in": 0,
-    "no-extend-native": 0,
-    "wrap-iife": [
-      2,
-      "any"
-    ],
-    "indent": [
-      2,
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "no-use-before-define": 2,
-    "max-depth": [
-      2,
-      3
-    ],
-    "max-params": [
-      2,
-      3
-    ],
-    "new-cap": [
-      2,
-      {
-        "properties": false
-      }
-    ],
-    "no-caller": 0,
+    "guard-for-in": 2,
+    "indent": [2, 2, { "SwitchCase": 1 }],
+    "key-spacing": 2,
+    "max-depth": [2, 5],
+    "max-params": [2, 5],
+    "new-cap": [2, { "properties": false }],
+    "no-bitwise": 0,
+    "no-caller": 2,
+    "no-cond-assign": 2,
+    "no-delete-var": 2,
+    "no-dupe-args": 2,
+    "no-duplicate-case": 2,
+    "no-dupe-keys": 2,
     "no-empty": 2,
+    "no-empty-character-class": 2,
+    "no-eval": 2,
+    "no-extend-native": 0,
+    "no-extra-boolean-cast": 2,
+    "no-func-assign": 2,
+    "no-loop-func": 2,
+    "no-multi-str": 0,
     "no-new": 0,
     "no-plusplus": 0,
-    "quotes": [
-      2,
-      "single"
-    ],
     "no-script-url": 2,
     "no-shadow": 0,
-    "strict": [
-      2,
-      "global"
-    ],
-    "dot-notation": 0,
+    "no-sparse-arrays": 2,
+    "no-trailing-spaces": 2,
     "no-undef": 2,
+    "no-unused-expressions": [2, { "allowShortCircuit": true, "allowTernary": true }],
+    "no-unreachable": 2,
     "no-unused-vars": 2,
-    "no-multi-str": 0
+    "no-use-before-define": 2,
+    "no-useless-call": 2,
+    "no-useless-escape": 2,
+    "no-void": 2,
+    "no-with": 2,
+    "operator-linebreak": [2, "before"],
+    "padded-blocks": [2, "never"],
+    "quotes": [2, "single"],
+    "radix": 2,
+    "semi": [2, "never"],
+    "space-before-blocks": [2, "always"],
+    "space-before-function-paren": [2, "never"],
+    "spaced-comment": 2,
+    "strict": [2, "global"],
+    "valid-jsdoc": 2,
+    "valid-typeof": 2,
+    "wrap-iife": [2, "any"]
   }
 }

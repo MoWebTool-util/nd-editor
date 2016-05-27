@@ -1,13 +1,13 @@
-'use strict';
+'use strict'
 
-var ua = navigator.userAgent;
+var ua = navigator.userAgent
 
-var isIOS = /iP(?:ad|hone|od)/.test(ua);
-var isMac = /Mac OS X/.test(ua);
-var isGecko = /Gecko\//.test(ua);
-var isIElt11 = /Trident\/[456]\./.test(ua);
-var isPresto = !!window.opera;
-var isWebKit = /WebKit\//.test(ua);
+var isIOS = /iP(?:ad|hone|od)/.test(ua)
+var isMac = /Mac OS X/.test(ua)
+var isGecko = /Gecko\//.test(ua)
+var isIElt11 = /Trident\/[456]\./.test(ua)
+var isPresto = !!window.opera
+var isWebKit = /WebKit\//.test(ua)
 
 module.exports = {
 
@@ -84,7 +84,7 @@ module.exports = {
 
   indexOf: Array.prototype.indexOf
 
-};
+}
 
 // Polyfill for FF3.5
 // if (!Object.create) {

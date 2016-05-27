@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
-var Widget = require('nd-widget');
+var Widget = require('nd-widget')
 
-var env = require('./env');
-var DOM = require('./dom');
-var Range = require('./range');
-var TreeWalker = require('./tree-walker');
+var env = require('./env')
+var DOM = require('./dom')
+var Range = require('./range')
+var TreeWalker = require('./tree-walker')
 
-var indexOf = Array.prototype.indexOf;
-var filter = Array.prototype.filter;
+var indexOf = Array.prototype.indexOf
+var filter = Array.prototype.filter
 
 var Squire = Widget.extend({
 
@@ -38,49 +38,73 @@ var Squire = Widget.extend({
     doc: {
       value: null,
       getter: function() {
-        return this.element[0];
+        return this.element[0]
       }
     },
 
     win: {
       value: null,
       getter: function() {
-        return this.getDocument().defaultView;
+        return this.getDocument().defaultView
       }
     },
 
     body: {
       value: null,
       getter: function() {
-        return this.element[0].body;
+        return this.element[0].body
       }
     }
   },
 
-  events: {},
+  events: {
+    blur: '_enableRestoreSelection',
+    input: '_disableRestoreSelection',
+    mousedown: '_disableRestoreSelection',
+    touchstart: '_disableRestoreSelection',
+    focus: '_restoreSelection'
+  },
+
+  _enableRestoreSelection: function() {
+    this._restoreSelection = true
+  },
+
+  _disableRestoreSelection: function() {
+    this._restoreSelection = false
+  },
+
+  _restoreSelection: function() {
+    if (this._restoreSelection) {
+      this.range.setSelection()
+    }
+  },
 
   initProps: function() {
-    this.keyHandlers = {};
+    this.keyHandlers = {}
 
-    this._hasZWS = false;
+    this._hasZWS = false
 
-    this.env = env;
-    this.dom = new DOM(this);
-    this.range = new Range(this);
+    this.env = env
+    this.dom = new DOM(this)
+    this.range = new Range(this)
     // this.undo = new UndoManager(this);
 
     // this._ignoreChange = false;
 
-    var events = this.events;
+    var events = this.events
 
     if (env.losesSelectionOnBlur) {
       // IE loses selection state of iframe on blur, so make sure we
       // cache it just before it loses focus.
-      events.beforedeactivate = 'getSelection';
+      events.beforedeactivate = 'getSelection'
     }
 
     // Opera does not fire keydown repeatedly.
-    events[env.isPresto ? 'keypress' : 'keydown'] = '_onKey';
+    events[env.isPresto ? 'keypress' : 'keydown'] = '_onKey'
+  },
+
+  getSelection: function() {
+    this.range.getSelection()
   },
 
   setup: function() {
@@ -100,61 +124,63 @@ var Squire = Widget.extend({
             this.data.slice(offset)),
           next = this.nextSibling,
           parent = this.parentNode,
-          toDelete = this.length - offset;
+          toDelete = this.length - offset
 
         if (next) {
-          parent.insertBefore(afterSplit, next);
+          parent.insertBefore(afterSplit, next)
         } else {
-          parent.appendChild(afterSplit);
+          parent.appendChild(afterSplit)
         }
 
         if (toDelete) {
-          this.deleteData(offset, toDelete);
+          this.deleteData(offset, toDelete)
         }
 
-        return afterSplit;
-      };
+        return afterSplit
+      }
     }
 
-    this.getBody().setAttribute('contenteditable', 'true');
+    this.getBody().setAttribute('contenteditable', 'true')
 
     // Remove Firefox's built-in controls
     try {
-      this.getDocument().execCommand('enableObjectResizing', false, 'false');
-      this.getDocument().execCommand('enableInlineTableEditing', false, 'false');
-    } catch (error) {}
+      this.getDocument().execCommand('enableObjectResizing', false, 'false')
+      this.getDocument().execCommand('enableInlineTableEditing', false, 'false')
+    } catch (e) {
+      // log(e)
+    }
 
-    this.setHTML('');
+    this.setHTML('')
   },
 
   addKeyHandler: function(key, handler) {
     key.split(/\s+/).forEach(function(key) {
-      this.keyHandlers[key] = handler;
-    }, this);
+      this.keyHandlers[key] = handler
+    }, this)
   },
 
   createElement: function(tag, props, children) {
-    return this.dom.createElement(tag, props, children);
+    return this.dom.createElement(tag, props, children)
   },
 
   createTextNode: function(text) {
-    return this.dom.createTextNode(text);
+    return this.dom.createTextNode(text)
   },
 
   didError: function(error) {
-    console.log(error);
+    console.log(error)
   },
 
   getWindow: function() {
-    return this.get('win');
+    return this.get('win')
   },
 
   getDocument: function() {
-    return this.get('doc');
+    return this.get('doc')
   },
 
   getBody: function() {
-    return this.get('body');
+    return this.get('body')
   },
 
   // destroy: function() {
@@ -166,31 +192,31 @@ var Squire = Widget.extend({
   // },
 
   selectNode: function(node) {
-    this.range.selectNode(node);
+    this.range.selectNode(node)
   },
 
   getSelectedNode: function(range) {
-    return this.range.getSelectedNode(range);
+    return this.range.getSelectedNode(range)
   },
 
   getSelectedText: function() {
-    return this.range.getSelectedText();
+    return this.range.getSelectedText()
   },
 
   getPath: function() {
-    return this.currentPath;
+    return this.currentPath
   },
 
   _didAddZWS: function() {
-    this._hasZWS = true;
+    this._hasZWS = true
   },
 
   _removeZWS: function() {
     if (!this._hasZWS) {
-      return;
+      return
     }
-    this.removeZWS(this.getBody());
-    this._hasZWS = false;
+    this.removeZWS(this.getBody())
+    this._hasZWS = false
   },
 
   // --- Focus ---
@@ -201,12 +227,12 @@ var Squire = Widget.extend({
     // (otherwise it is focussed, but the cursor doesn't appear).
     // Opera (Presto-variant) however will lose the selection if you call this!
     if (!env.isPresto) {
-      this.getBody().focus();
+      this.getBody().focus()
     }
 
-    this.getWindow().focus();
+    this.getWindow().focus()
 
-    return this;
+    return this
   },
 
   blur: function() {
@@ -215,12 +241,12 @@ var Squire = Widget.extend({
     // the top frame, thus blurring this frame. This works in everything
     // except FF, so we need to call body.blur() in that as well.
     if (env.isGecko) {
-      this.getBody().blur();
+      this.getBody().blur()
     }
 
-    top.focus();
+    top.focus()
 
-    return this;
+    return this
   },
 
   _saveRangeToBookmark: function(range) {
@@ -232,73 +258,73 @@ var Squire = Widget.extend({
         id: env.END_SELECTION_ID,
         type: 'hidden'
       }),
-      temp;
+      temp
 
-    this.range.insertNodeInRange(range, startNode);
-    range.collapse(false);
-    this.range.insertNodeInRange(range, endNode);
+    this.range.insertNodeInRange(range, startNode)
+    range.collapse(false)
+    this.range.insertNodeInRange(range, endNode)
 
     // In a collapsed range, the start is sometimes inserted after the end!
-    if (startNode.compareDocumentPosition(endNode) &
-      env.DOCUMENT_POSITION_PRECEDING) {
-      startNode.id = env.END_SELECTION_ID;
-      endNode.id = env.START_SELECTION_ID;
-      temp = startNode;
-      startNode = endNode;
-      endNode = temp;
+    if (startNode.compareDocumentPosition(endNode)
+      & env.DOCUMENT_POSITION_PRECEDING) {
+      startNode.id = env.END_SELECTION_ID
+      endNode.id = env.START_SELECTION_ID
+      temp = startNode
+      startNode = endNode
+      endNode = temp
     }
 
-    range.setStartAfter(startNode);
-    range.setEndBefore(endNode);
+    range.setStartAfter(startNode)
+    range.setEndBefore(endNode)
   },
 
-  _getRangeAndRemoveBookmark: function(range, record) {
+  _getRangeAndRemoveBookmark: function(range/* , record */) {
     var doc = this.getDocument(),
       start = doc.getElementById(env.START_SELECTION_ID),
-      end = doc.getElementById(env.END_SELECTION_ID);
+      end = doc.getElementById(env.END_SELECTION_ID)
 
     if (start && end) {
       var startContainer = start.parentNode,
         endContainer = end.parentNode,
-        collapsed;
+        collapsed
 
       var _range = {
         startContainer: startContainer,
         endContainer: endContainer,
         startOffset: indexOf.call(startContainer.childNodes, start),
         endOffset: indexOf.call(endContainer.childNodes, end)
-      };
-
-      if (startContainer === endContainer) {
-        _range.endOffset--;
       }
 
-      this.dom.detach(start);
-      this.dom.detach(end);
+      if (startContainer === endContainer) {
+        _range.endOffset--
+      }
+
+      this.dom.detach(start)
+      this.dom.detach(end)
 
       // Merge any text nodes we split
-      this.dom.mergeInlines(startContainer, _range);
+      this.dom.mergeInlines(startContainer, _range)
 
       if (startContainer !== endContainer) {
-        this.dom.mergeInlines(endContainer, _range);
+        this.dom.mergeInlines(endContainer, _range)
       }
 
       if (!range) {
-        range = doc.createRange();
+        range = doc.createRange()
       }
 
-      range.setStart(_range.startContainer, _range.startOffset);
-      range.setEnd(_range.endContainer, _range.endOffset);
-      collapsed = range.collapsed;
+      range.setStart(_range.startContainer, _range.startOffset)
+      range.setEnd(_range.endContainer, _range.endOffset)
+      collapsed = range.collapsed
 
-      this.range.moveRangeBoundariesDownTree(range);
+      this.range.moveRangeBoundariesDownTree(range)
 
       if (collapsed) {
-        range.collapse(true);
+        range.collapse(true)
       }
     }
 
-    return range || null;
+    return range || null
   },
 
   // --- Inline formatting ---
@@ -308,60 +334,60 @@ var Squire = Widget.extend({
   hasFormat: function(tag, attributes, range) {
     // 0. Get selection
     if (!range && !(range = this.range.getSelection())) {
-      return false;
+      return false
     }
 
     // 1. Normalise the arguments
-    tag = tag.toUpperCase();
+    tag = tag.toUpperCase()
     if (!attributes) {
-      attributes = {};
+      attributes = {}
     }
 
     // If the common ancestor is inside the tag we require, we definitely
     // have the format.
     var root = range.commonAncestorContainer,
-      walker, node;
+      walker, node
 
     if (this.dom.getNearest(root, tag, attributes)) {
-      return true;
+      return true
     }
 
     // If common ancestor is a text node and doesn't have the format, we
     // definitely don't have it.
     if (root.nodeType === env.TEXT_NODE) {
-      return false;
+      return false
     }
 
     // Otherwise, check each text node at least partially contained within
     // the selection and make sure all of them have the format we want.
     walker = new TreeWalker(root, env.SHOW_TEXT, function(node) {
-      return this.range.isNodeContainedInRange(range, node, true);
-    }.bind(this), false);
+      return this.range.isNodeContainedInRange(range, node, true)
+    }.bind(this), false)
 
-    var seenNode = false;
+    var seenNode = false
 
     while ((node = walker.nextNode())) {
       if (!this.dom.getNearest(node, tag, attributes)) {
-        return false;
+        return false
       }
 
-      seenNode = true;
+      seenNode = true
     }
 
-    return seenNode;
+    return seenNode
   },
 
   _addFormat: function(tag, attributes, range) {
     // If the range is collapsed we simply insert the node by wrapping
     // it round the range and focus it.
     var el, walker, startContainer, endContainer, startOffset, endOffset,
-      node, needsFormat;
+      node, needsFormat
 
     if (range.collapsed) {
-      el = this.dom.fixCursor(this.createElement(tag, attributes));
-      this.range.insertNodeInRange(range, el);
-      range.setStart(el.firstChild, el.firstChild.length);
-      range.collapse(true);
+      el = this.dom.fixCursor(this.createElement(tag, attributes))
+      this.range.insertNodeInRange(range, el)
+      range.setStart(el.firstChild, el.firstChild.length)
+      range.collapse(true)
     }
     // Otherwise we find all the textnodes in the range (splitting
     // partially selected nodes) and if they're not already formatted
@@ -379,104 +405,104 @@ var Squire = Widget.extend({
         range.commonAncestorContainer,
         env.SHOW_TEXT | env.SHOW_ELEMENT,
         function(node) {
-          /*return (node.nodeType === env.TEXT_NODE ||
+          /* return (node.nodeType === env.TEXT_NODE ||
               node.nodeName === 'BR') && this.range.isNodeContainedInRange(range, node, true);
             */
           // ONLY INLINE AND CONTAINED NODES
-          return this.dom.isInline(node) &&
-            this.range.isNodeContainedInRange(range, node, true);
+          return this.dom.isInline(node)
+            && this.range.isNodeContainedInRange(range, node, true)
         }.bind(this),
         false
-      );
+      )
 
       // Start at the beginning node of the range and iterate through
       // all the nodes in the range that need formatting.
-      startContainer = range.startContainer;
-      startOffset = range.startOffset;
-      endContainer = range.endContainer;
-      endOffset = range.endOffset;
+      startContainer = range.startContainer
+      startOffset = range.startOffset
+      endContainer = range.endContainer
+      endOffset = range.endOffset
 
       // Make sure we start with a valid node.
-      walker.currentNode = startContainer;
+      walker.currentNode = startContainer
       if (!walker.filter(startContainer)) {
-        startContainer = walker.nextNode();
-        startOffset = 0;
+        startContainer = walker.nextNode()
+        startOffset = 0
       }
 
       // If there are no interesting nodes in the selection, abort
       if (!startContainer) {
-        return range;
+        return range
       }
 
       do {
-        node = walker.currentNode;
-        needsFormat = !this.dom.getNearest(node, tag, attributes);
+        node = walker.currentNode
+        needsFormat = !this.dom.getNearest(node, tag, attributes)
         if (needsFormat) {
           // <br> can never be a container node, so must have a text node
           // if node == (end|start)Container
           if (node === endContainer && node.length > endOffset) {
-            node.splitText(endOffset);
+            node.splitText(endOffset)
           }
           if (node === startContainer && startOffset) {
-            node = node.splitText(startOffset);
+            node = node.splitText(startOffset)
             if (endContainer === startContainer) {
-              endContainer = node;
-              endOffset -= startOffset;
+              endContainer = node
+              endOffset -= startOffset
             }
-            startContainer = node;
-            startOffset = 0;
+            startContainer = node
+            startOffset = 0
           }
-          el = this.createElement(tag, attributes);
-          this.dom.replaceWith(node, el);
-          el.appendChild(node);
+          el = this.createElement(tag, attributes)
+          this.dom.replaceWith(node, el)
+          el.appendChild(node)
         }
-      } while (walker.nextNode());
+      } while (walker.nextNode())
 
       // If we don't finish inside a text node, offset may have changed.
       if (endContainer.nodeType !== env.TEXT_NODE) {
         if (node.nodeType === env.TEXT_NODE) {
-          endContainer = node;
-          endOffset = node.length;
+          endContainer = node
+          endOffset = node.length
         } else {
           // If <br>, we must have just wrapped it, so it must have only
           // one child
-          endContainer = node.parentNode;
-          endOffset = 1;
+          endContainer = node.parentNode
+          endOffset = 1
         }
       }
 
       // Now set the selection to as it was before
       range = this.range.create(
-        startContainer, startOffset, endContainer, endOffset);
+        startContainer, startOffset, endContainer, endOffset)
     }
-    return range;
+    return range
   },
 
   _removeFormat: function(tag, attributes, range, partial) {
     // Add bookmark
-    this._saveRangeToBookmark(range);
+    this._saveRangeToBookmark(range)
 
     // We need a node in the selection to break the surrounding
     // formatted text.
     var doc = this.getDocument(),
-      fixer;
+      fixer
 
     if (range.collapsed) {
       if (env.cantFocusEmptyTextNodes) {
-        fixer = doc.createTextNode(env.ZWS);
-        this._didAddZWS();
+        fixer = doc.createTextNode(env.ZWS)
+        this._didAddZWS()
       } else {
-        fixer = doc.createTextNode('');
+        fixer = doc.createTextNode('')
       }
 
-      this.range.insertNodeInRange(range, fixer);
+      this.range.insertNodeInRange(range, fixer)
     }
 
     // Find block-level ancestor of selection
-    var root = range.commonAncestorContainer;
+    var root = range.commonAncestorContainer
 
     while (this.dom.isInline(root)) {
-      root = root.parentNode;
+      root = root.parentNode
     }
 
     // Find text nodes inside formatTags that are not in selection and
@@ -490,31 +516,31 @@ var Squire = Widget.extend({
         // If the node is completely contained by the range then
         // we're going to remove all formatting so ignore it.
         if (this.range.isNodeContainedInRange(range, node, false)) {
-          return;
+          return
         }
 
         var isText = (node.nodeType === env.TEXT_NODE),
-          child, next;
+          child, next
 
         // If not at least partially contained, wrap entire contents
         // in a clone of the tag we're removing and we're done.
         if (!this.range.isNodeContainedInRange(range, node, true)) {
           // Ignore bookmarks and empty text nodes
-          if (node.nodeName !== 'INPUT' &&
-            (!isText || node.data)) {
-            toWrap.push([exemplar, node]);
+          if (node.nodeName !== 'INPUT'
+            && (!isText || node.data)) {
+            toWrap.push([exemplar, node])
           }
-          return;
+          return
         }
 
         // Split any partially selected text nodes.
         if (isText) {
           if (node === endContainer && endOffset !== node.length) {
-            toWrap.push([exemplar, node.splitText(endOffset)]);
+            toWrap.push([exemplar, node.splitText(endOffset)])
           }
           if (node === startContainer && startOffset) {
-            node.splitText(startOffset);
-            toWrap.push([exemplar, node]);
+            node.splitText(startOffset)
+            toWrap.push([exemplar, node])
           }
         }
         // If not a text node, recurse onto all children.
@@ -522,44 +548,44 @@ var Squire = Widget.extend({
         // to examineNode, hence find the next sibling first.
         else {
           for (child = node.firstChild; child; child = next) {
-            next = child.nextSibling;
-            examineNode(child, exemplar);
+            next = child.nextSibling
+            examineNode(child, exemplar)
           }
         }
       }.bind(this),
       formatTags = filter.call(
         root.getElementsByTagName(tag),
         function(el) {
-          return this.range.isNodeContainedInRange(range, el, true) &&
-            this.dom.hasTagAttributes(el, tag, attributes);
+          return this.range.isNodeContainedInRange(range, el, true)
+            && this.dom.hasTagAttributes(el, tag, attributes)
         }.bind(this)
-      );
+      )
 
     if (!partial) {
       formatTags.forEach(function(node) {
-        examineNode(node, node);
-      });
+        examineNode(node, node)
+      })
     }
 
     // Now wrap unselected nodes in the tag
     toWrap.forEach(function(item) {
       // [ exemplar, node ] tuple
       var el = item[0].cloneNode(false),
-        node = item[1];
-      this.dom.replaceWith(node, el);
-      el.appendChild(node);
-    }, this);
+        node = item[1]
+      this.dom.replaceWith(node, el)
+      el.appendChild(node)
+    }, this)
 
     // and remove old formatting tags.
     formatTags.forEach(function(el) {
-      this.dom.replaceWith(el, this.dom.empty(el));
-    }, this);
+      this.dom.replaceWith(el, this.dom.empty(el))
+    }, this)
 
     // Merge adjacent inlines:
-    this._getRangeAndRemoveBookmark(range);
+    this._getRangeAndRemoveBookmark(range)
 
     if (fixer) {
-      range.collapse(false);
+      range.collapse(false)
     }
 
     var _range = {
@@ -567,36 +593,36 @@ var Squire = Widget.extend({
       startOffset: range.startOffset,
       endContainer: range.endContainer,
       endOffset: range.endOffset
-    };
+    }
 
-    this.dom.mergeInlines(root, _range);
+    this.dom.mergeInlines(root, _range)
 
-    range.setStart(_range.startContainer, _range.startOffset);
-    range.setEnd(_range.endContainer, _range.endOffset);
+    range.setStart(_range.startContainer, _range.startOffset)
+    range.setEnd(_range.endContainer, _range.endOffset)
 
-    return range;
+    return range
   },
 
   changeFormat: function(add, remove, range, partial) {
     // Normalise the arguments and get selection
     if (!range && !(range = this.range.getSelection())) {
-      return;
+      return
     }
 
     // Save undo checkpoint
     // this.undo.record(range);
-    this._getRangeAndRemoveBookmark(range, true);
+    this._getRangeAndRemoveBookmark(range, true)
 
     if (remove) {
       range = this._removeFormat(remove.tag.toUpperCase(),
-        remove.attributes || {}, range, partial);
+        remove.attributes || {}, range, partial)
     }
     if (add) {
       range = this._addFormat(add.tag.toUpperCase(),
-        add.attributes || {}, range);
+        add.attributes || {}, range)
     }
 
-    this.range.setSelection(range);
+    this.range.setSelection(range)
     // this.path.update(range, true);
 
     // We're not still in an undo state
@@ -604,42 +630,42 @@ var Squire = Widget.extend({
     // this._docWasChanged();
     // }
 
-    return this;
+    return this
   },
 
   removeEmptyInlines: function(root) {
     var children = root.childNodes,
       l = children.length,
-      child;
+      child
     while (l--) {
-      child = children[l];
+      child = children[l]
       if (child.nodeType === env.ELEMENT_NODE && !this.dom.isLeaf(child)) {
-        this.removeEmptyInlines(child);
+        this.removeEmptyInlines(child)
         if (this.dom.isInline(child) && !child.firstChild) {
-          root.removeChild(child);
+          root.removeChild(child)
         }
       } else if (child.nodeType === env.TEXT_NODE && !child.data) {
-        root.removeChild(child);
+        root.removeChild(child)
       }
     }
   },
 
   removeZWS: function(root) {
     var walker = new TreeWalker(root, env.SHOW_TEXT, function() {
-        return true;
+        return true
       }, false),
-      parent, node, index;
+      parent, node, index
     while ((node = walker.nextNode())) {
       while ((index = node.data.indexOf(env.ZWS)) > -1) {
         if (node.length === 1) {
           do {
-            parent = node.parentNode;
-            parent.removeChild(node);
-            node = parent;
-          } while (this.dom.isInline(node) && !this.dom.getLength(node));
-          break;
+            parent = node.parentNode
+            parent.removeChild(node)
+            node = parent
+          } while (this.dom.isInline(node) && !this.dom.getLength(node))
+          break
         } else {
-          node.deleteData(index, 1);
+          node.deleteData(index, 1)
         }
       }
     }
@@ -649,33 +675,33 @@ var Squire = Widget.extend({
     var doc = frag.ownerDocument,
       walker = new TreeWalker(frag, env.SHOW_TEXT,
         function(node) {
-          return !this.dom.getNearest(node, 'A');
+          return !this.dom.getNearest(node, 'A')
         }.bind(this), false),
-      node, data, parent, match, index, endIndex, child;
+      node, data, parent, match, index, endIndex, child
 
     while ((node = walker.nextNode())) {
-      data = node.data;
-      parent = node.parentNode;
+      data = node.data
+      parent = node.parentNode
 
       while ((match = env.LINK_REGEXP.exec(data))) {
-        index = match.index;
-        endIndex = index + match[0].length;
+        index = match.index
+        endIndex = index + match[0].length
 
         if (index) {
-          child = doc.createTextNode(data.slice(0, index));
-          parent.insertBefore(child, node);
+          child = doc.createTextNode(data.slice(0, index))
+          parent.insertBefore(child, node)
         }
 
-        child = doc.createElement('A');
-        child.textContent = data.slice(index, endIndex);
-        child.href = match[1] ?
-          /^(?:ht|f)tps?:/.test(match[1]) ?
-          match[1] :
-          'http://' + match[1] :
-          'mailto:' + match[2];
+        child = doc.createElement('A')
+        child.textContent = data.slice(index, endIndex)
+        child.href = match[1]
+          ? /^(?:ht|f)tps?:/.test(match[1])
+          ? match[1]
+          : 'http://' + match[1]
+          : 'mailto:' + match[2]
 
-        parent.insertBefore(child, node);
-        node.data = data = data.slice(endIndex);
+        parent.insertBefore(child, node)
+        node.data = data = data.slice(endIndex)
       }
     }
   },
@@ -690,7 +716,7 @@ var Squire = Widget.extend({
   cleanTree: function(node, allowStyles) {
     var children = node.childNodes,
       i, l, child, nodeName, nodeType, rewriter, childLength,
-      data, j, ll;
+      data, j, ll
 
     var spanToSemantic = {
       backgroundColor: {
@@ -699,7 +725,7 @@ var Squire = Widget.extend({
           return this.dom.createElement('SPAN', {
             'class': 'highlight',
             style: 'background-color: ' + colour
-          });
+          })
         }.bind(this)
       },
       color: {
@@ -708,19 +734,19 @@ var Squire = Widget.extend({
           return this.dom.createElement('SPAN', {
             'class': 'colour',
             style: 'color:' + colour
-          });
+          })
         }.bind(this)
       },
       fontWeight: {
         regexp: /^bold/i,
-        replace: function(doc) {
-          return this.dom.createElement('STRONG');
+        replace: function(/* doc */) {
+          return this.dom.createElement('STRONG')
         }.bind(this)
       },
       fontStyle: {
         regexp: /^italic/i,
-        replace: function(doc) {
-          return this.dom.createElement('EM');
+        replace: function(/* doc */) {
+          return this.dom.createElement('EM')
         }.bind(this)
       },
       fontFamily: {
@@ -729,7 +755,7 @@ var Squire = Widget.extend({
           return this.dom.createElement('SPAN', {
             'class': 'font',
             style: 'font-family:' + family
-          });
+          })
         }.bind(this)
       },
       fontSize: {
@@ -738,38 +764,40 @@ var Squire = Widget.extend({
           return this.dom.createElement('SPAN', {
             'class': 'size',
             style: 'font-size:' + size
-          });
+          })
         }.bind(this)
       }
-    };
+    }
 
     var stylesRewriters = {
       SPAN: function(span, parent) {
         var style = span.style,
           doc = span.ownerDocument,
-          attr, converter, css, newTreeBottom, newTreeTop, el;
+          attr, converter, css, newTreeBottom, newTreeTop, el
 
         for (attr in spanToSemantic) {
-          converter = spanToSemantic[attr];
-          css = style[attr];
-          if (css && converter.regexp.test(css)) {
-            el = converter.replace(doc, css);
-            if (newTreeBottom) {
-              newTreeBottom.appendChild(el);
-            }
-            newTreeBottom = el;
-            if (!newTreeTop) {
-              newTreeTop = el;
+          if (spanToSemantic.hasOwnProperty(attr)) {
+            converter = spanToSemantic[attr]
+            css = style[attr]
+            if (css && converter.regexp.test(css)) {
+              el = converter.replace(doc, css)
+              if (newTreeBottom) {
+                newTreeBottom.appendChild(el)
+              }
+              newTreeBottom = el
+              if (!newTreeTop) {
+                newTreeTop = el
+              }
             }
           }
         }
 
         if (newTreeTop) {
-          newTreeBottom.appendChild(this.dom.empty(span));
-          parent.replaceChild(newTreeTop, span);
+          newTreeBottom.appendChild(this.dom.empty(span))
+          parent.replaceChild(newTreeTop, span)
         }
 
-        return newTreeBottom || span;
+        return newTreeBottom || span
       }.bind(this),
       B: this.replaceWithTag('STRONG'),
       I: this.replaceWithTag('EM'),
@@ -779,86 +807,86 @@ var Squire = Widget.extend({
           size = node.size,
           colour = node.color,
           fontSpan, sizeSpan, colourSpan,
-          newTreeBottom, newTreeTop;
+          newTreeBottom, newTreeTop
         if (face) {
           fontSpan = this.dom.createElement('SPAN', {
             'class': 'font',
             style: 'font-family:' + face
-          });
-          newTreeTop = fontSpan;
-          newTreeBottom = fontSpan;
+          })
+          newTreeTop = fontSpan
+          newTreeBottom = fontSpan
         }
         if (size) {
           sizeSpan = this.dom.createElement('SPAN', {
             'class': 'size',
             style: 'font-size:' + env.FONT_SIZES[size] + 'px'
-          });
+          })
           if (!newTreeTop) {
-            newTreeTop = sizeSpan;
+            newTreeTop = sizeSpan
           }
           if (newTreeBottom) {
-            newTreeBottom.appendChild(sizeSpan);
+            newTreeBottom.appendChild(sizeSpan)
           }
-          newTreeBottom = sizeSpan;
+          newTreeBottom = sizeSpan
         }
         if (colour && /^#?([\dA-F]{3}){1,2}$/i.test(colour)) {
           if (colour.charAt(0) !== '#') {
-            colour = '#' + colour;
+            colour = '#' + colour
           }
           colourSpan = this.dom.createElement('SPAN', {
             'class': 'colour',
             style: 'color:' + colour
-          });
+          })
           if (!newTreeTop) {
-            newTreeTop = colourSpan;
+            newTreeTop = colourSpan
           }
           if (newTreeBottom) {
-            newTreeBottom.appendChild(colourSpan);
+            newTreeBottom.appendChild(colourSpan)
           }
-          newTreeBottom = colourSpan;
+          newTreeBottom = colourSpan
         }
         if (!newTreeTop) {
-          newTreeTop = newTreeBottom = this.dom.createElement('SPAN');
+          newTreeTop = newTreeBottom = this.dom.createElement('SPAN')
         }
-        parent.replaceChild(newTreeTop, node);
-        newTreeBottom.appendChild(this.dom.empty(node));
-        return newTreeBottom;
+        parent.replaceChild(newTreeTop, node)
+        newTreeBottom.appendChild(this.dom.empty(node))
+        return newTreeBottom
       }.bind(this),
       TT: function(node, parent) {
         var el = this.dom.createElement('SPAN', {
           'class': 'font',
           style: 'font-family:menlo,consolas,"courier new",monospace'
-        });
-        parent.replaceChild(el, node);
-        el.appendChild(this.dom.empty(node));
-        return el;
+        })
+        parent.replaceChild(el, node)
+        el.appendChild(this.dom.empty(node))
+        return el
       }.bind(this)
-    };
+    }
 
     for (i = 0, l = children.length; i < l; i += 1) {
-      child = children[i];
-      nodeName = child.nodeName;
-      nodeType = child.nodeType;
-      rewriter = stylesRewriters[nodeName];
+      child = children[i]
+      nodeName = child.nodeName
+      nodeType = child.nodeType
+      rewriter = stylesRewriters[nodeName]
       if (nodeType === env.ELEMENT_NODE) {
-        childLength = child.childNodes.length;
+        childLength = child.childNodes.length
         if (rewriter) {
-          child = rewriter(child, node);
-        } else if (!env.ALLOWED_BLOCK.test(nodeName) &&
-          !this.dom.isInline(child)) {
-          i -= 1;
-          l += childLength - 1;
-          node.replaceChild(this.dom.empty(child), child);
-          continue;
+          child = rewriter(child, node)
+        } else if (!env.ALLOWED_BLOCK.test(nodeName)
+          && !this.dom.isInline(child)) {
+          i -= 1
+          l += childLength - 1
+          node.replaceChild(this.dom.empty(child), child)
+          continue
         } else if (!allowStyles && child.style.cssText) {
-          child.removeAttribute('style');
+          child.removeAttribute('style')
         }
         if (childLength) {
-          this.cleanTree(child, allowStyles);
+          this.cleanTree(child, allowStyles)
         }
       } else {
         if (nodeType === env.TEXT_NODE) {
-          data = child.data;
+          data = child.data
           // Use \S instead of notWS, because we want to remove nodes
           // which are just nbsp, in order to cleanup <div>nbsp<br></div>
           // construct.
@@ -866,76 +894,76 @@ var Squire = Widget.extend({
             // If the parent node is inline, don't trim this node as
             // it probably isn't at the end of the block.
             if (this.dom.isInline(node)) {
-              continue;
+              continue
             }
-            j = 0;
-            ll = data.length;
+            j = 0
+            ll = data.length
             if (!i || !this.dom.isInline(children[i - 1])) {
               while (j < ll && !env.notWS.test(data.charAt(j))) {
-                j += 1;
+                j += 1
               }
               if (j) {
-                child.data = data = data.slice(j);
-                ll -= j;
+                child.data = data = data.slice(j)
+                ll -= j
               }
             }
             if (i + 1 === l || !this.dom.isInline(children[i + 1])) {
-              j = ll;
+              j = ll
               while (j > 0 && !env.notWS.test(data.charAt(j - 1))) {
-                j -= 1;
+                j -= 1
               }
               if (j < ll) {
-                child.data = data.slice(0, j);
+                child.data = data.slice(0, j)
               }
             }
-            continue;
+            continue
           }
           // If we have just white space, it may still be important if it
           // separates two inline nodes, e.g. "<a>link</a> <a>link</a>".
-          else if (i && i + 1 < l &&
-            this.dom.isInline(children[i - 1]) &&
-            this.dom.isInline(children[i + 1])) {
-            child.data = ' ';
-            continue;
+          else if (i && i + 1 < l
+            && this.dom.isInline(children[i - 1])
+            && this.dom.isInline(children[i + 1])) {
+            child.data = ' '
+            continue
           }
         }
-        node.removeChild(child);
-        i -= 1;
-        l -= 1;
+        node.removeChild(child)
+        i -= 1
+        l -= 1
       }
     }
-    return node;
+    return node
   },
 
   replaceWithTag: function(tag) {
     return function(node, parent) {
-      var el = this.dom.createElement(tag);
-      parent.replaceChild(el, node);
-      el.appendChild(this.dom.empty(node));
-      return el;
-    }.bind(this);
+      var el = this.dom.createElement(tag)
+      parent.replaceChild(el, node)
+      el.appendChild(this.dom.empty(node))
+      return el
+    }.bind(this)
   },
 
   isLineBreak: function(br) {
     var block = br.parentNode,
-      walker;
+      walker
 
     while (this.dom.isInline(block)) {
-      block = block.parentNode;
+      block = block.parentNode
     }
 
     var notWSTextNode = function(node) {
-      return node.nodeType === env.ELEMENT_NODE ?
-        node.nodeName === 'BR' :
-        env.notWS.test(node.data);
-    };
+      return node.nodeType === env.ELEMENT_NODE
+        ? node.nodeName === 'BR'
+        : env.notWS.test(node.data)
+    }
 
     walker = new TreeWalker(
-      block, env.SHOW_ELEMENT | env.SHOW_TEXT, notWSTextNode);
+      block, env.SHOW_ELEMENT | env.SHOW_TEXT, notWSTextNode)
 
-    walker.currentNode = br;
+    walker.currentNode = br
 
-    return !!walker.nextNode();
+    return !!walker.nextNode()
   },
 
   // <br> elements are treated specially, and differently depending on the
@@ -949,7 +977,7 @@ var Squire = Widget.extend({
     var brs = root.querySelectorAll('BR'),
       brBreaksLine = [],
       l = brs.length,
-      i, br, block;
+      i, br, block
 
     // Must calculate whether the <br> breaks a line first, because if we
     // have two <br>s next to each other, after the first one is converted
@@ -957,22 +985,22 @@ var Squire = Widget.extend({
     // therefore seem to not be a line break. But in its original context it
     // was, so we should also convert it to a block split.
     for (i = 0; i < l; i += 1) {
-      brBreaksLine[i] = this.isLineBreak(brs[i]);
+      brBreaksLine[i] = this.isLineBreak(brs[i])
     }
     while (l--) {
-      br = brs[l];
+      br = brs[l]
       // Cleanup may have removed it
-      block = br.parentNode;
+      block = br.parentNode
       if (!block) {
-        continue;
+        continue
       }
       while (this.dom.isInline(block)) {
-        block = block.parentNode;
+        block = block.parentNode
       }
       // If this is not inside a block, replace it by wrapping
       // inlines in a <div>.
       if (!this.dom.isBlock(block)) {
-        this.dom.fixContainer(block);
+        this.dom.fixContainer(block)
       } else {
         // If it doesn't break a line, just remove it; it's not doing
         // anything useful. We'll add it back later if required by the
@@ -983,39 +1011,39 @@ var Squire = Widget.extend({
           // the formatting too much (e.g. <li> -> to two list items!)
           // so just play it safe and leave it.
           if (block.nodeName !== 'DIV') {
-            continue;
+            continue
           }
-          this.dom.split(br.parentNode, br, block.parentNode);
+          this.dom.split(br.parentNode, br, block.parentNode)
         }
-        this.dom.detach(br);
+        this.dom.detach(br)
       }
     }
   },
 
   forEachBlock: function(fn, mutates, range) {
     if (!range && !(range = this.range.getSelection())) {
-      return this;
+      return this
     }
 
     // Save undo checkpoint
     if (mutates) {
       // this.undo.record(range);
-      this._getRangeAndRemoveBookmark(range, true);
+      this._getRangeAndRemoveBookmark(range, true)
     }
 
     var start = this.range.getStartBlockOfRange(range),
-      end = this.range.getEndBlockOfRange(range);
+      end = this.range.getEndBlockOfRange(range)
 
     if (start && end) {
       do {
         if (fn(start) || start === end) {
-          break;
+          break
         }
-      } while ((start = this.dom.getNextBlock(start)));
+      } while ((start = this.dom.getNextBlock(start)))
     }
 
     if (mutates) {
-      this.range.setSelection(range);
+      this.range.setSelection(range)
 
       // Path may have changed
       // this.path.update(range, true);
@@ -1026,12 +1054,12 @@ var Squire = Widget.extend({
       // }
     }
 
-    return this;
+    return this
   },
 
   modifyBlocks: function(modify, range) {
     if (!range && !(range = this.range.getSelection())) {
-      return this;
+      return this
     }
 
     // 1. Save undo checkpoint and bookmark selection
@@ -1042,26 +1070,26 @@ var Squire = Widget.extend({
     // }
 
     // 2. Expand range to block boundaries
-    this.range.expandRangeToBlockBoundaries(range);
+    this.range.expandRangeToBlockBoundaries(range)
 
     // 3. Remove range.
     var body = this.getBody(),
-      frag;
-    this.range.moveRangeBoundariesUpTree(range, body);
-    frag = this.range.extractContentsOfRange(range, body);
+      frag
+    this.range.moveRangeBoundariesUpTree(range, body)
+    frag = this.range.extractContentsOfRange(range, body)
 
     // 4. Modify tree of fragment and reinsert.
-    this.range.insertNodeInRange(range, modify.call(this, frag));
+    this.range.insertNodeInRange(range, modify.call(this, frag))
 
     // 5. Merge containers at edges
     if (range.endOffset < range.endContainer.childNodes.length) {
-      this.dom.mergeContainers(range.endContainer.childNodes[range.endOffset]);
+      this.dom.mergeContainers(range.endContainer.childNodes[range.endOffset])
     }
-    this.dom.mergeContainers(range.startContainer.childNodes[range.startOffset]);
+    this.dom.mergeContainers(range.startContainer.childNodes[range.startOffset])
 
     // 6. Restore selection
-    this._getRangeAndRemoveBookmark(range);
-    this.range.setSelection(range);
+    this._getRangeAndRemoveBookmark(range)
+    this.range.setSelection(range)
     // this.path.update(range, true);
 
     // 7. We're not still in an undo state
@@ -1069,14 +1097,14 @@ var Squire = Widget.extend({
     // this._docWasChanged();
     // }
 
-    return this;
+    return this
   },
 
   _ensureBottomLine: function() {
     var body = this.getBody(),
-      last = body.lastElementChild;
+      last = body.lastElementChild
     if (!last || last.nodeName !== this.get('defaultBlockTag') || !this.dom.isBlock(last)) {
-      body.appendChild(this.dom.createDefaultBlock());
+      body.appendChild(this.dom.createDefaultBlock())
     }
   },
 
@@ -1085,61 +1113,61 @@ var Squire = Widget.extend({
     var code = event.keyCode,
       key = env.KEYS[code],
       modifiers = '',
-      range = this.range.getSelection();
+      range = this.range.getSelection()
 
     if (!key) {
-      key = String.fromCharCode(code).toLowerCase();
+      key = String.fromCharCode(code).toLowerCase()
 
       // Only reliable for letters and numbers
       if (!/^[A-Za-z0-9]$/.test(key)) {
-        key = '';
+        key = ''
       }
     }
 
     // On keypress, delete and '.' both have event.keyCode 46
     // Must check event.which to differentiate.
     if (env.isPresto && event.which === 46) {
-      key = '.';
+      key = '.'
     }
 
     // Function keys
     if (111 < code && code < 124) {
-      key = 'f' + (code - 111);
+      key = 'f' + (code - 111)
     }
 
     // We need to apply the backspace/delete handlers regardless of
     // control key modifiers.
     if (key !== 'backspace' && key !== 'delete') {
       if (event.altKey) {
-        modifiers += 'alt+';
+        modifiers += 'alt+'
       }
       if (event.ctrlKey || event.metaKey) {
-        modifiers += 'ctrl+';
+        modifiers += 'ctrl+'
       }
     }
 
     // However, on Windows, shift-delete is apparently "cut" (WTF right?), so
     // we want to let the browser handle shift-delete.
     if (event.shiftKey) {
-      modifiers += 'shift+';
+      modifiers += 'shift+'
     }
 
-    key = modifiers + key;
+    key = modifiers + key
 
     if (this.keyHandlers[key]) {
       this.keyHandlers[key](event, {
         editor: this,
         shortcut: key,
         range: range
-      });
+      })
     } else if (key.length === 1 && !range.collapsed) {
       // Record undo checkpoint.
       // this.undo.record(range);
-      this._getRangeAndRemoveBookmark(range, true);
+      this._getRangeAndRemoveBookmark(range, true)
       // Delete the selection
-      this.range.deleteContentsOfRange(range);
-      this._ensureBottomLine();
-      this.range.setSelection(range);
+      this.range.deleteContentsOfRange(range)
+      this._ensureBottomLine()
+      this.range.setSelection(range)
       // this.path.update(range, true);
     }
   },
@@ -1147,85 +1175,85 @@ var Squire = Widget.extend({
   // --- Get/Set data ---
 
   _getHTML: function() {
-    return this.getBody().innerHTML;
+    return this.getBody().innerHTML
   },
 
   _setHTML: function(html) {
-    var node = this.getBody();
-    node.innerHTML = html;
+    var node = this.getBody()
+    node.innerHTML = html
 
     do {
-      this.dom.fixCursor(node);
-    } while ((node = this.dom.getNextBlock(node)));
+      this.dom.fixCursor(node)
+    } while ((node = this.dom.getNextBlock(node)))
 
     // this._ignoreChange = true;
   },
 
   getHTML: function(withBookMark) {
     var brs = [],
-      node, fixer, html, l, range;
+      node, fixer, html, l, range
     if (withBookMark && (range = this.range.getSelection())) {
-      this._saveRangeToBookmark(range);
+      this._saveRangeToBookmark(range)
     }
     if (env.useTextFixer) {
-      node = this.getBody();
+      node = this.getBody()
       while ((node = this.dom.getNextBlock(node))) {
         if (!node.textContent && !node.querySelector('BR')) {
-          fixer = this.createElement('BR');
-          node.appendChild(fixer);
-          brs.push(fixer);
+          fixer = this.createElement('BR')
+          node.appendChild(fixer)
+          brs.push(fixer)
         }
       }
     }
-    html = this._getHTML().replace(/\u200B/g, '');
+    html = this._getHTML().replace(/\u200B/g, '')
     if (env.useTextFixer) {
-      l = brs.length;
+      l = brs.length
       while (l--) {
-        this.dom.detach(brs[l]);
+        this.dom.detach(brs[l])
       }
     }
     if (range) {
-      this._getRangeAndRemoveBookmark(range);
+      this._getRangeAndRemoveBookmark(range)
     }
-    return html;
+    return html
   },
 
   setHTML: function(html) {
     var frag = this.getDocument().createDocumentFragment(),
       div = this.createElement('DIV'),
-      child;
+      child
 
     // Parse HTML into DOM tree
-    div.innerHTML = html;
-    frag.appendChild(this.dom.empty(div));
+    div.innerHTML = html
+    frag.appendChild(this.dom.empty(div))
 
-    this.cleanTree(frag, true);
-    this.cleanupBRs(frag);
+    this.cleanTree(frag, true)
+    this.cleanupBRs(frag)
 
-    this.dom.fixContainer(frag);
+    this.dom.fixContainer(frag)
 
     // Fix cursor
-    var node = frag;
+    var node = frag
     while ((node = this.dom.getNextBlock(node))) {
-      this.dom.fixCursor(node);
+      this.dom.fixCursor(node)
     }
 
     // Don't fire an input event
     // this._ignoreChange = true;
 
     // Remove existing body children
-    var body = this.getBody();
+    var body = this.getBody()
     while ((child = body.lastChild)) {
-      body.removeChild(child);
+      body.removeChild(child)
     }
 
     // And insert new content
-    body.appendChild(frag);
-    this.dom.fixCursor(body);
+    body.appendChild(frag)
+    this.dom.fixCursor(body)
 
-    this.saveRange(body);
+    this.saveRange(body)
 
-    return this;
+    return this
   },
 
   saveRange: function(body) {
@@ -1236,67 +1264,67 @@ var Squire = Widget.extend({
     // this.undo.inUndo(false);
 
     // Record undo state
-    var range = this._getRangeAndRemoveBookmark() ||
-      this.range.create(body.firstChild, 0);
+    var range = this._getRangeAndRemoveBookmark()
+      || this.range.create(body.firstChild, 0)
 
     // this.undo.record(range);
-    this._getRangeAndRemoveBookmark(range, true);
+    this._getRangeAndRemoveBookmark(range, true)
 
     // IE will also set focus when selecting text so don't use
     // range.setSelection. Instead, just store it in lastSelection, so if
     // anything calls getSelection before first focus, we have a range
     // to return.
-    this.range.setSelection(range, env.losesSelectionOnBlur);
+    this.range.setSelection(range)
 
     // this.path.update(range, true);
   },
 
   insertElement: function(el, range) {
     if (!range) {
-      range = this.range.getSelection();
+      range = this.range.getSelection()
     }
 
-    range.collapse(true);
+    range.collapse(true)
 
     if (this.dom.isInline(el)) {
-      this.range.insertNodeInRange(range, el);
-      range.setStartAfter(el);
+      this.range.insertNodeInRange(range, el)
+      range.setStartAfter(el)
     } else {
       // Get containing block node.
       var body = this.getBody(),
         splitNode = this.range.getStartBlockOfRange(range) || body,
-        parent, nodeAfterSplit;
+        parent, nodeAfterSplit
 
       // While at end of container node, move up DOM tree.
       while (splitNode !== body && !splitNode.nextSibling) {
-        splitNode = splitNode.parentNode;
+        splitNode = splitNode.parentNode
       }
 
       // If in the middle of a container node, split up to body.
       if (splitNode !== body) {
-        parent = splitNode.parentNode;
-        nodeAfterSplit = this.dom.split(parent, splitNode.nextSibling, body);
+        parent = splitNode.parentNode
+        nodeAfterSplit = this.dom.split(parent, splitNode.nextSibling, body)
       }
 
       if (nodeAfterSplit) {
-        body.insertBefore(el, nodeAfterSplit);
-        range.setStart(nodeAfterSplit, 0);
-        range.setStart(nodeAfterSplit, 0);
-        this.range.moveRangeBoundariesDownTree(range);
+        body.insertBefore(el, nodeAfterSplit)
+        range.setStart(nodeAfterSplit, 0)
+        range.setStart(nodeAfterSplit, 0)
+        this.range.moveRangeBoundariesDownTree(range)
       } else {
-        body.appendChild(el);
+        body.appendChild(el)
         // Insert blank line below block.
-        body.appendChild(this.dom.createDefaultBlock());
-        range.setStart(el, 0);
-        range.setEnd(el, 0);
+        body.appendChild(this.dom.createDefaultBlock())
+        range.setStart(el, 0)
+        range.setEnd(el, 0)
       }
 
-      this.focus();
-      this.range.setSelection(range);
+      this.focus()
+      this.range.setSelection(range)
       // this.path.update(range);
     }
 
-    return this;
+    return this
   },
 
   // Insert HTML at the cursor location. If the selection is not collapsed
@@ -1305,47 +1333,47 @@ var Squire = Widget.extend({
   insertHTML: function(html) {
     var range = this.range.getSelection(),
       frag = this.getDocument().createDocumentFragment(),
-      div = this.createElement('DIV');
+      div = this.createElement('DIV')
 
     // Parse HTML into DOM tree
-    div.innerHTML = html;
-    frag.appendChild(this.dom.empty(div));
+    div.innerHTML = html
+    frag.appendChild(this.dom.empty(div))
 
     // Record undo checkpoint
     // this.undo.record(range);
-    this._getRangeAndRemoveBookmark(range, true);
+    this._getRangeAndRemoveBookmark(range, true)
 
     try {
-      frag.normalize();
-      this.addLinks(frag);
-      this.cleanTree(frag, true);
-      this.cleanupBRs(frag);
-      this.removeEmptyInlines(frag);
-      this.dom.fixContainer.call(this, frag);
+      frag.normalize()
+      this.addLinks(frag)
+      this.cleanTree(frag, true)
+      this.cleanupBRs(frag)
+      this.removeEmptyInlines(frag)
+      this.dom.fixContainer.call(this, frag)
 
-      var node = frag;
+      var node = frag
       while ((node = this.dom.getNextBlock(node))) {
-        this.dom.fixCursor(node);
+        this.dom.fixCursor(node)
       }
 
-      this.range.insertTreeFragmentIntoRange(range, frag);
+      this.range.insertTreeFragmentIntoRange(range, frag)
 
       // if (!env.canObserveMutations) {
       // this._docWasChanged();
       // }
 
-      range.collapse(false);
-      this._ensureBottomLine();
+      range.collapse(false)
+      this._ensureBottomLine()
 
-      this.range.setSelection(range);
+      this.range.setSelection(range)
       // this.path.update(range, true);
     } catch (error) {
-      this.didError(error);
+      this.didError(error)
     }
 
-    return this;
+    return this
   }
 
-});
+})
 
-module.exports = Squire;
+module.exports = Squire

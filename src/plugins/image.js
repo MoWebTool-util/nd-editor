@@ -3,27 +3,27 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
-var __ = require('nd-i18n');
-var debug = require('nd-debug');
+var __ = require('nd-i18n')
+var debug = require('nd-debug')
 
-var FormDialog = require('../modules/form-dialog');
+var FormDialog = require('../modules/form-dialog')
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host
 
-  var dialog;
+  var dialog
 
-  var PER_SIZE = '100%';
-  var cache = {};
+  var PER_SIZE = '100%'
+  var cache = {}
 
-  var server = host.get('server');
+  var server = host.get('server')
 
   if (!server) {
-    debug.warn('Image uploader requires server.');
-    return;
+    debug.warn('Image uploader requires server.')
+    return
   }
 
   host.addButton({
@@ -31,106 +31,105 @@ module.exports = function() {
     text: 'Image',
     group: 'richtext',
     handlers: function(e, d) {
-      var editor = d.editor;
+      var editor = d.editor
       // 2ac6061d-22c0-4925-91a2-50cfb8593bc2
-      var url = '';
-      var file = '';
-      var size = 0;
+      var url = ''
+      var file = ''
+      var size = 0
 
-      var cpath = editor.getPath().slice();
-      var image;
-      var match;
+      var cpath = editor.getPath().slice()
+      var image
+      var match
 
       while ((image = cpath.pop())) {
         if (image.nodeName === 'IMG') {
-
           if (!image.parentNode) {
-            continue;
+            continue
           }
 
-          editor.selectNode(image);
+          editor.selectNode(image)
 
-          url = image.src;
+          url = image.src
 
-          match = url.match(/\?dentryId=([-0-9a-f]+)/);
+          match = url.match(/\?dentryId=([-0-9a-f]+)/)
           if (match) {
-            file = match[1];
+            file = match[1]
           }
 
-          match = url.match(/&size=(\d+)/);
+          match = url.match(/&size=(\d+)/)
           if (match) {
-            size = +match[1];
+            size = +match[1]
           }
 
-          break;
+          break
         }
 
-        image = null;
+        image = null
       }
 
       function setImageSize() {
-        var img = new Image();
+        var img = new Image()
 
         img.onload = function() {
           if (cache.size === PER_SIZE) {
-            image.setAttribute('width', PER_SIZE);
+            image.setAttribute('width', PER_SIZE)
           }else {
-            image.setAttribute('height', img.height);
-            image.setAttribute('width', img.width);
+            image.setAttribute('height', img.height)
+            image.setAttribute('width', img.width)
           }
 
-          img.onload = null;
-        };
+          img.onload = null
+        }
 
-        img.src = image.src;
+        img.src = image.src
 
         if (img.complete) {
-          img.onload();
+          img.onload()
         }
       }
 
       var makeImage = function(data) {
-        cache.size = data.size;
-        data.size = +data.size;
+        cache.size = data.size
+        data.size = +data.size
 
         if (data.file) {
           data.url = server.download({
             value: data.file
           }, data.size ? {
             size: data.size
-          } : null).src;
+          } : null).src
         }
 
         if (image) {
-          image.src = data.url;
+          image.src = data.url
         } else {
           image = editor.createElement('IMG', {
             src: data.url
-          });
-          editor.insertElement(image);
+          })
+          editor.insertElement(image)
         }
 
-        image.setAttribute('data-src', data.file);
+        image.setAttribute('data-src', data.file)
 
-        setImageSize();
+        setImageSize()
 
-        dialog = null;
+        dialog = null
 
-        return editor.focus();
-      };
+        return editor.focus()
+      }
 
       var sizes = [PER_SIZE, 80, 120, 160, 240, 320, 480, 640, 960]
         .map(function(size) {
           return {
             text: size,
             value: size
-          };
-        });
+          }
+        })
 
       sizes.unshift({
         text: __('原图'),
         value: 0
-      });
+      })
 
       var fields = [{
         name: 'size',
@@ -148,52 +147,52 @@ module.exports = function() {
           title: __('图片文件'),
           swf: '/lib/uploader.swf'
         }
-      }];
+      }]
 
       dialog = new FormDialog({
-          title: __('插入图片'),
-          formData: {
-            size: size,
-            file: file
-          },
-          fields: fields,
-          pluginCfg: {
-            'Upload': [function() {
-              this.setOptions('config', {
-                server: server
-              });
-            }]
-          }
-        })
+        title: __('插入图片'),
+        formData: {
+          size: size,
+          file: file
+        },
+        fields: fields,
+        pluginCfg: {
+          'Upload': [function() {
+            this.setOptions('config', {
+              server: server
+            })
+          }]
+        }
+      })
         .on('formCancel', function() {
-          this.destroy();
+          this.destroy()
         })
         .on('formSubmit', function(data) {
-          makeImage(data);
-          this.destroy();
+          makeImage(data)
+          this.destroy()
         })
-        .render();
+        .render()
     }
-  });
+  })
 
   host.ready(function(editor) {
     editor.delegateEvents({
       'mousedown': function(e) {
         if (/^(?:IMG|AUDIO|VIDEO|HR)$/.test(e.target.nodeName)) {
-          this.selectNode(e.target);
+          this.selectNode(e.target)
         }
       }
-    });
-  });
+    })
+  })
 
   host.before('destroy', function() {
-    dialog && dialog.destroy();
-  });
+    dialog && dialog.destroy()
+  })
 
   host.on('viewChange', function(state) {
-    host.enableButton('image', state === 'wysiwyg');
-  });
+    host.enableButton('image', state === 'wysiwyg')
+  })
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}

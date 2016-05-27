@@ -3,14 +3,14 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
-var __ = require('nd-i18n');
-var Alert = require('nd-alert');
-var Form = require('nd-form');
-var Select = require('nd-select');
-var Upload = require('nd-upload');
-var Validator = require('nd-validator');
+var __ = require('nd-i18n')
+var Alert = require('nd-alert')
+var Form = require('nd-form')
+var Select = require('nd-select')
+var Upload = require('nd-upload')
+var Validator = require('nd-validator')
 
 module.exports = Form.extend({
   Plugins: [Select, Upload, Validator],
@@ -27,7 +27,7 @@ module.exports = Form.extend({
     className: 'ui-form-dialog',
     beforeSetup: function() {
       this.before('render', function() {
-        var form = this;
+        var form = this
 
         form.dialog = new Alert({
           // width: 360,
@@ -39,23 +39,23 @@ module.exports = Form.extend({
           events: {
             // override
             'click [data-role=close]': function(e) {
-              e.preventDefault();
-              form.destroy();
+              e.preventDefault()
+              form.destroy()
             }
           }
-        }).render();
+        }).render()
 
         // change parentNode
-        form.set('parentNode', form.dialog.$('[data-role="message"]'));
-      });
+        form.set('parentNode', form.dialog.$('[data-role="message"]'))
+      })
 
       this.after('render', function() {
-        this.dialog.show();
-      });
+        this.dialog.show()
+      })
 
       this.before('destroy', function() {
-        this.dialog.hide();
-      });
+        this.dialog.hide()
+      })
     }
   }
-});
+})

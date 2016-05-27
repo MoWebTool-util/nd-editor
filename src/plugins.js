@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = [
   {
@@ -41,4 +41,4 @@ module.exports = [
     name: 'image',
     starter: require('./plugins/image')
   }
-];
+]

@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /*
     Native TreeWalker is buggy in IE and Opera:
@@ -24,12 +24,12 @@ var typeToBitArray = {
   9: 256,
   // DOCUMENT_FRAGMENT_NODE
   11: 1024
-};
+}
 
 function TreeWalker(root, nodeType, filter) {
-  this.root = this.currentNode = root;
-  this.nodeType = nodeType;
-  this.filter = filter;
+  this.root = this.currentNode = root
+  this.nodeType = nodeType
+  this.filter = filter
 }
 
 TreeWalker.prototype.nextNode = function() {
@@ -37,71 +37,69 @@ TreeWalker.prototype.nextNode = function() {
     root = this.root,
     nodeType = this.nodeType,
     filter = this.filter,
-    node;
+    node
 
   while (true) {
-    node = current.firstChild;
+    node = current.firstChild
 
     while (!node && current) {
       if (current === root) {
-        break;
+        break
       }
 
-      node = current.nextSibling;
+      node = current.nextSibling
 
       if (!node) {
-        current = current.parentNode;
+        current = current.parentNode
       }
     }
 
     if (!node) {
-      return null;
+      return null
     }
 
-    if ((typeToBitArray[node.nodeType] & nodeType) &&
-      filter(node)) {
-      this.currentNode = node;
-      return node;
+    if ((typeToBitArray[node.nodeType] & nodeType) && filter(node)) {
+      this.currentNode = node
+      return node
     }
 
-    current = node;
+    current = node
   }
-};
+}
 
 TreeWalker.prototype.previousNode = function() {
   var current = this.currentNode,
     root = this.root,
     nodeType = this.nodeType,
     filter = this.filter,
-    node;
+    node
 
   while (true) {
     if (current === root) {
-      return null;
+      return null
     }
 
-    node = current.previousSibling;
+    node = current.previousSibling
 
     if (node) {
       while ((current = node.lastChild)) {
-        node = current;
+        node = current
       }
     } else {
-      node = current.parentNode;
+      node = current.parentNode
     }
 
     if (!node) {
-      return null;
+      return null
     }
 
-    if ((typeToBitArray[node.nodeType] & nodeType) &&
-      filter(node)) {
-      this.currentNode = node;
-      return node;
+    if ((typeToBitArray[node.nodeType] & nodeType) && filter(node)) {
+      this.currentNode = node
+      return node
     }
 
-    current = node;
+    current = node
   }
-};
+}
 
-module.exports = TreeWalker;
+module.exports = TreeWalker

@@ -3,42 +3,42 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
 module.exports = function() {
   var plugin = this,
     // host === editor
     host = plugin.host,
-    env = host.env;
+    env = host.env
 
-  var _ignoreChange = false;
+  var _ignoreChange = false
 
   var ignoreChange = function() {
-    _ignoreChange = true;
-  };
+    _ignoreChange = true
+  }
 
   var mutationCallback = function() {
     if (env.canObserveMutations && _ignoreChange) {
-      _ignoreChange = false;
-      return;
+      _ignoreChange = false
+      return
     }
 
-    host.trigger('mutate');
-  };
+    host.trigger('mutate')
+  }
 
   if (env.canObserveMutations) {
-    var mutation = new MutationObserver(mutationCallback);
+    var mutation = new MutationObserver(mutationCallback)
 
     mutation.observe(host.getBody(), {
       childList: true,
       attributes: true,
       characterData: true,
       subtree: true
-    });
+    })
 
     host.before('destroy', function() {
-      mutation.disconnect();
-    });
+      mutation.disconnect()
+    })
   } else {
     host.delegateEvents({
       'keyup': function(e) {
@@ -46,18 +46,18 @@ module.exports = function() {
         // 1. A modifier key (other than shift) wasn't held down
         // 2. The key pressed is not in range 16<=x<=20 (control keys)
         // 3. The key pressed is not in range 33<=x<=45 (navigation keys)
-        if (!e.ctrlKey && !e.metaKey && !e.altKey &&
-          (e.keyCode < 16 || e.keyCode > 20) &&
-          (e.keyCode < 33 || e.keyCode > 45)) {
-          mutationCallback();
+        if (!e.ctrlKey && !e.metaKey && !e.altKey
+          && (e.keyCode < 16 || e.keyCode > 20)
+          && (e.keyCode < 33 || e.keyCode > 45)) {
+          mutationCallback()
         }
       }
-    });
+    })
   }
 
-  host.after('_setHTML', ignoreChange);
-  host.before('setHTML', ignoreChange);
+  host.after('_setHTML', ignoreChange)
+  host.before('setHTML', ignoreChange)
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}

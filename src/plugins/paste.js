@@ -3,37 +3,36 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host
 
   var onCut = function() {
     // Save undo checkpoint
-    var range = this.range.getSelection();
+    var range = this.range.getSelection()
     // this.undo.record(range);
-    this._getRangeAndRemoveBookmark(range, true);
-    this.range.setSelection(range);
+    this._getRangeAndRemoveBookmark(range, true)
+    this.range.setSelection(range)
 
     setTimeout(function(editor) {
       try {
         // If all content removed, ensure div at start of body.
-        editor._ensureBottomLine();
+        editor._ensureBottomLine()
       } catch (error) {
-        editor.didError(error);
+        editor.didError(error)
       }
-    }, 0, this);
-  };
-
+    }, 0, this)
+  }
 
   // IE sometimes fires the beforepaste event twice; make sure it is not run
   // again before our after paste function is called.
-  var awaitingPaste = false;
+  var awaitingPaste = false
 
   var onPaste = function(e) {
     if (awaitingPaste) {
-      return;
+      return
     }
 
     // Treat image paste as a drop of an image file.
@@ -41,70 +40,70 @@ module.exports = function() {
       items = clipboardData && clipboardData.items,
       fireDrop = false,
       hasImage = false,
-      l, type;
+      l, type
 
     if (items) {
-      l = items.length;
+      l = items.length
       while (l--) {
-        type = items[l].type;
+        type = items[l].type
         if (type === 'text/html') {
-          hasImage = false;
-          break;
+          hasImage = false
+          break
         }
         if (/^image\/.*/.test(type)) {
-          hasImage = true;
+          hasImage = true
         }
       }
       if (hasImage) {
-        e.preventDefault();
+        e.preventDefault()
         this.trigger('dragover', {
           dataTransfer: clipboardData,
-          /*jshint loopfunc: true */
+          /* jshint loopfunc: true */
           preventDefault: function() {
-            fireDrop = true;
+            fireDrop = true
           }
-          /*jshint loopfunc: false */
-        });
+          /* jshint loopfunc: false */
+        })
 
         if (fireDrop) {
           this.trigger('drop', {
             dataTransfer: clipboardData
-          });
+          })
         }
-        return;
+        return
       }
     }
 
-    awaitingPaste = true;
+    awaitingPaste = true
 
     var body = this.getBody(),
       range = this.range.getSelection(),
-      startContainer, startOffset, endContainer, endOffset, startBlock;
+      startContainer, startOffset, endContainer, endOffset, startBlock
 
     // Record undo checkpoint
     // this.undo.record(range);
-    this._getRangeAndRemoveBookmark(range, true);
+    this._getRangeAndRemoveBookmark(range, true)
 
     // Note current selection. We must do this AFTER recording the undo
     // checkpoint, as this modifies the DOM.
-    startContainer = range.startContainer;
-    startOffset = range.startOffset;
-    endContainer = range.endContainer;
-    endOffset = range.endOffset;
-    startBlock = this.range.getStartBlockOfRange(range);
+    startContainer = range.startContainer
+    startOffset = range.startOffset
+    endContainer = range.endContainer
+    endOffset = range.endOffset
+    startBlock = this.range.getStartBlockOfRange(range)
 
     // We need to position the pasteArea in the visible portion of the screen
     // to stop the browser auto-scrolling.
     var pasteArea = this.createElement('DIV', {
-      style: 'position: absolute; overflow: hidden; top:' +
-        (body.scrollTop +
-          (startBlock ? startBlock.getBoundingClientRect().top : 0)) +
-        'px; left: 0; width: 1px; height: 1px;'
-    });
+      style: 'position: absolute; overflow: hidden; top:'
+        + (body.scrollTop
+        + (startBlock ? startBlock.getBoundingClientRect().top : 0))
+        + 'px; left: 0; width: 1px; height: 1px;'
+    })
 
-    body.appendChild(pasteArea);
-    range.selectNodeContents(pasteArea);
-    this.range.setSelection(range);
+    body.appendChild(pasteArea)
+    range.selectNodeContents(pasteArea)
+    this.range.setSelection(range)
 
     // A setTimeout of 0 means this is added to the back of the
     // single javascript thread, so it will be executed after the
@@ -115,76 +114,75 @@ module.exports = function() {
         var frag = editor.dom.empty(editor.dom.detach(pasteArea)),
           first = frag.firstChild,
           range = editor.range.create(
-            startContainer, startOffset, endContainer, endOffset);
+            startContainer, startOffset, endContainer, endOffset)
 
         // Was anything actually pasted?
         if (first) {
           // Safari and IE like putting extra divs around things.
-          if (first === frag.lastChild &&
-            first.nodeName === 'DIV') {
-            frag.replaceChild(editor.dom.empty(first), first);
+          if (first === frag.lastChild && first.nodeName === 'DIV') {
+            frag.replaceChild(editor.dom.empty(first), first)
           }
 
-          frag.normalize();
-          editor.addLinks(frag);
-          editor.cleanTree(frag, false);
-          editor.cleanupBRs(frag);
-          editor.removeEmptyInlines(frag);
+          frag.normalize()
+          editor.addLinks(frag)
+          editor.cleanTree(frag, false)
+          editor.cleanupBRs(frag)
+          editor.removeEmptyInlines(frag)
 
           var node = frag,
             doPaste = true,
             event = {
               fragment: frag,
               preventDefault: function() {
-                doPaste = false;
+                doPaste = false
               },
               isDefaultPrevented: function() {
-                return !doPaste;
+                return !doPaste
               }
-            };
+            }
 
           while ((node = editor.dom.getNextBlock(node))) {
-            editor.dom.fixCursor(node);
+            editor.dom.fixCursor(node)
           }
 
-          editor.trigger('willPaste', event);
+          editor.trigger('willPaste', event)
 
           // Insert pasted data
           if (doPaste) {
-            editor.range.insertTreeFragmentIntoRange(range, event.fragment);
+            editor.range.insertTreeFragmentIntoRange(range, event.fragment)
 
             if (!editor.env.canObserveMutations) {
-              editor._docWasChanged();
+              editor._docWasChanged()
             }
 
-            range.collapse(false);
-            editor._ensureBottomLine();
+            range.collapse(false)
+            editor._ensureBottomLine()
           }
         }
 
-        editor.range.setSelection(range);
+        editor.range.setSelection(range)
         // editor.path.update(range, true);
 
-        awaitingPaste = false;
+        awaitingPaste = false
       } catch (error) {
-        editor.didError(error);
+        editor.didError(error)
       }
-    }, 0, this);
-  };
+    }, 0, this)
+  }
 
   host.ready(function(editor) {
     editor.delegateEvents(
-      editor.env.isIElt11 ?
-      {
+      editor.env.isIElt11
+      ? {
         beforecut: onCut,
         beforepaste: onPaste
       } : {
         cut: onCut,
         paste: onPaste
       }
-    );
-  });
+    )
+  })
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}
